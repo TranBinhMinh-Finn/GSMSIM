@@ -1,15 +1,17 @@
-import random
+from random import randint
 from algorithm.com128 import auth
 
 class HLR:
-    def search_Ki(phone):
-        #search
-        return Ki
+    def __init__(self):
+        self.ms_db = {}
     
-    def auth_check(phone):
-        RAND = random(0, 65535)
+    def search_Ki(self, imsi):
+        return self.ms_db[imsi]
+    
+    def create_triplet(self, imsi):
+        Ki = self.search_Ki(imsi)
+        if Ki == None:
+            return -1
+        RAND = randint(0, 65535)
         Kc, SRES = auth(Ki, RAND)
-        Ki = HLR.search_Ki(phone)
-        if(SRES == phone.cal_SRES(RAND)):
-            return True
-        return False
+        return RAND, Kc, SRES
