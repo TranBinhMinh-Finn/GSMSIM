@@ -20,3 +20,9 @@ class BSC:
             print(f"SMS from {phone.name} to {recipient.name} ({recipient.number}): {message}")
         else:
             print(f"Phone number {number} not found.")
+            
+    def authenticate(self, phone):
+        """
+        Pass the authentication request to MSC
+        """
+        self.msc.authenticate(phone)
