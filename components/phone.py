@@ -39,12 +39,27 @@ class Phone:
         SRES, Kc = auth(self.Ki, RAND)
         return SRES
 
-    def call(self, number):
+    def make_call(self, phone, received_number):
         if not self.bts:
             if not self.connect_to_bts(self.search_for_bts()):
                 print(f"Failed to connect to network for {self.name}")
                 return
-        self.bts.make_call(self, number) 
+        result = self.bts.make_call(phone, received_number)
+        if result == False:
+            print("Call failed")
+    
+    def call_confirm(from_number):
+        print("Call started with number: {from_number}")
+    
+    def request_end_call(self, phone):
+        result = self.bts.end_call(phone)
+        if result == True:
+            print("End successful")
+        else:
+            print("Fail to end call")
+    
+    def end_call():
+        print("Call ended")
     
     def text(self, number, message):
         if not self.bts:
