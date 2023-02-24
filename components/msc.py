@@ -1,5 +1,5 @@
 from components.hlr_auc import HLR
-from components.vlr import VLR, VLR_data
+from components.vlr import VLR, VLR_data, Call_data
 
 class MSC:
     def __init__(self, name):
@@ -35,10 +35,10 @@ class MSC:
                 #Call successful
                 self.vlr.change_status(phone)
                 self.vlr.change_status(received_number)
-                self.vlr.assign_number_call(make_call_phone, received_number)
-                self.vlr.assign_number_call(received_phone, phone)
-                received_phone.bsc.call_confirm(received_phone.bts, received_phone.ms, phone)
-                make_call_phone.bsc.call_confirm(make_call_phone.bts, make_call_phone.ms, received_number)
+                self.vlr.update_call_data(make_call_phone, phone, received_number)
+                self.vlr.update_call_data(received_phone, phone, received_number)
+                received_phone.bsc.call_confirm(received_phone.bts, received_phone.ms, received_phone.call_data)
+                make_call_phone.bsc.call_confirm(make_call_phone.bts, make_call_phone.ms, make_call_phone.call_data)
             else:
                 return False
             return True
@@ -51,8 +51,8 @@ class MSC:
         phone_receive_end_call = self.vlr.search_phone(receive_number)
         self.vlr.change_status(phone)
         self.vlr.change_status(receive_number)
-        phone_end_call.bsc.end_call(phone_end_call.bts, phone_end_call.ms)
-        phone_receive_end_call.bsc.end_call(phone_receive_end_call.bts, phone_receive_end_call.ms)
+        phone_end_call.bsc.end_call(phone_end_call.bts, phone_end_call.ms, phone_end_call.call_data)
+        phone_receive_end_call.bsc.end_call(phone_receive_end_call.bts, phone_receive_end_call.ms, phone_end_call.call_data)
         return True
         
     

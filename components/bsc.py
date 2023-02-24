@@ -1,3 +1,5 @@
+from vlr import Call_data
+
 class BSC:
     def __init__(self, msc, name):
         self.msc = msc
@@ -15,8 +17,8 @@ class BSC:
     def request_end_call(self, phone):
         return self.msc.request_end_call(phone)
     
-    def end_call(self, bts, phone):
-        bts.end_call(phone)
+    def end_call(self, bts, phone, call_data):
+        bts.end_call(phone, call_data)
     
     def send_sms(self, phone, number, message):
         recipient = self.msc.search_phone(number)
