@@ -1,11 +1,15 @@
 from random import randint
 from algorithm.com128 import auth
-from vlr import VLR
+from .vlr import VLR
 
 class HLR_data:
     imsi: int
     serving_vlr: VLR
     Ki: str
+    def __init__(self, imsi, Ki, serving_vlr=None):
+        self.imsi = imsi
+        self.Ki = Ki
+        self.serving_vlr = serving_vlr
 
     
 class HLR:

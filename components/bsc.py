@@ -1,7 +1,10 @@
+BSC_CAPACITY = 5
+
 class BSC:
-    def __init__(self, msc, name):
+    def __init__(self, msc, name, capacity=BSC_CAPACITY):
         self.msc = msc
         self.name = name
+        self.capacity = capacity
 
     def add_bts(self, bts):
         self.bts_list.append(bts)

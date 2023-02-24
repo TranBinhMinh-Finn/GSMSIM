@@ -1,16 +1,17 @@
-from components.hlr_auc import HLR
-from components.vlr import VLR, VLR_data
+from .hlr_auc import HLR
+from .vlr import VLR, VLR_data
 
 class MSC:
-    def __init__(self, name):
+    def __init__(self, name="", hlr = None):
         self.name = name
-        self.hlr = HLR()
+        self.hlr = hlr
         self.vlr = VLR()
         self.eir = {}
 
     def add_bsc(self, bsc):
         self.bsc_list.append(bsc)
     
+    #TODO: make an add bts function. Add bts to an available bsc. If all bsc are at capacity, create a new one.
     def authenticate(self, phone):
         RAND, Kc, SRES = self.hlr.create_triplet(phone.number)
         if RAND == -1:

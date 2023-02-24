@@ -1,7 +1,7 @@
 from random import randint
-from bsc import BSC
-from bts import BTS
-from phone import Phone
+from .bsc import BSC
+from .bts import BTS
+from .phone import Phone
 
 TMSI_GEN_RANGE = 2 ** 32 - 2
 
