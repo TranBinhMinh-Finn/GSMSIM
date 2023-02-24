@@ -2,7 +2,9 @@ from components.bsc import BSC
 from components.bts import BTS
 from components.msc import MSC
 from components.phone import Phone
-
+from components.hlr_auc import HLR, HLR_data
+from components.network import Network
+"""
 msc1 = MSC("network1")
 bscList = []
 btsList = []
@@ -26,4 +28,5 @@ for bts in btsList:
     
 phoneList[0].call(1)
 phoneList[2].call(1)
-    
+"""
+network = Network("452", "01", "84", "91")
