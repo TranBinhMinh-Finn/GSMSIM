@@ -2,21 +2,31 @@ class BSC:
     def __init__(self, msc, name):
         self.msc = msc
         self.name = name
-        self.bts_list = []
 
     def add_bts(self, bts):
         self.bts_list.append(bts)
 
-    def make_call(self, phone, number):
-        recipient = self.msc.search_phone(number)
-        if recipient:
-            print(f"Call from {phone.name} to {recipient.name} ({recipient.number})")
-        else:
-            print(f"Phone number {number} not found.")
+    def make_call(self, phone, received_number):
+        return self.msc.make_call(phone, received_number)
 
+    def call_confirm(self, bts, phone, from_number):
+        bts.call_confirm(phone, from_number)
+        
+    def request_end_call(self, phone):
+        return self.msc.request_end_call(phone)
+    
+    def end_call(self, bts, phone):
+        bts.end_call(phone)
+    
     def send_sms(self, phone, number, message):
         recipient = self.msc.search_phone(number)
         if recipient:
             print(f"SMS from {phone.name} to {recipient.name} ({recipient.number}): {message}")
         else:
             print(f"Phone number {number} not found.")
+            
+    def authenticate(self, phone):
+        """
+        Pass the authentication request to MSC
+        """
+        self.msc.authenticate(phone)
