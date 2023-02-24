@@ -1,4 +1,5 @@
 from algorithm.com128 import auth
+from vlr import Call_data
 
 class Phone:
     def __init__(self, number, imsi, ki, name=""):
@@ -48,7 +49,10 @@ class Phone:
         if result == False:
             print("Call failed")
     
-    def call_confirm(from_number):
+    def call_confirm(self, call_data):
+        from_number = call_data.number_make_call
+        if(self.number == from_number): 
+            from_number = call_data.number_receive_call
         print("Call started with number: {from_number}")
     
     def request_end_call(self, phone):
@@ -58,8 +62,11 @@ class Phone:
         else:
             print("Fail to end call")
     
-    def end_call():
-        print("Call ended")
+    def end_call(self, call_data):
+        from_number = call_data.number_make_call
+        if(self.number == from_number): 
+            from_number = call_data.number_receive_call
+        print("Call with number {from_number} ended")
     
     def text(self, number, message):
         if not self.bts:

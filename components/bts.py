@@ -1,3 +1,4 @@
+from vlr import Call_data
 
 class BTS:
     def __init__(self, bsc, name = "bts"):
@@ -16,11 +17,11 @@ class BTS:
     def call_confirm(self, phone, from_number):
         phone.call_confirm(from_number)
         
-    def request_end_call(self, phone):
-        return self.bsc.end_call(phone)
+    def request_end_call(self, call_data):
+        return self.bsc.end_call(call_data)
     
-    def end_call(self, phone):
-        phone.end_call()
+    def end_call(self, phone, call_data):
+        phone.end_call(call_data)
     
     def send_sms(self, phone, number, message):
         self.bsc.send_sms(phone, number, message)
