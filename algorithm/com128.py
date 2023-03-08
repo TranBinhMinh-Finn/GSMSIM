@@ -110,6 +110,7 @@ def intarr2hex(input):
 
 def auth(Ki, RAND):
     Ki = hex2intarr(Ki)
+    RAND = hex2intarr(RAND)
     OUTPUT = comp128v23(Ki, RAND, 2)
     SRES = OUTPUT[:4]
     Kc = OUTPUT[4:]
