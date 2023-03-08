@@ -9,24 +9,24 @@ class Network:
         self.mcc = mcc # mobile country code
         self.mnc = mnc # mobile network code
         self.cc = cc # country code
-        self.ndc = ndc # national destination
+        self.ndc = ndc # national destination code
         self.hlr = HLR()
-        self.msc = []
+        self.msc = MSC(hlr=self.hlr)
         self.ms_count = 0
         
-    def add_msc(self):
-        msc = MSC(hlr=self.hlr)
+    def add_bts(self):
+        return self.msc.add_bts()
         
     def create_new_ms(self):
         self.ms_count+=1
         phone_number = format(self.ms_count,"09d")
         imsi = self.mcc + self.mnc + format(self.ms_count,"010d")
-        Ki = binascii.b2a_hex(os.urandom(32))
+        Ki = binascii.b2a_hex(os.urandom(16)).decode("utf-8") 
         self.hlr.add_ms(phone_number=phone_number, data=HLR_data(imsi=imsi, Ki=Ki))
         return Phone(
                     number=phone_number,
                     imsi=imsi,
-                    Ki=Ki)
+                    ki=Ki)
         
-        
+    
         
