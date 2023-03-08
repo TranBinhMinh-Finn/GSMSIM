@@ -1,5 +1,4 @@
 from algorithm.com128 import auth
-from vlr import Call_data
 
 class Phone:
     def __init__(self, number, imsi, ki, name=""):
@@ -19,8 +18,10 @@ class Phone:
     
     def connect_to_bts(self, bts):
         if bts.authenticate(self):
+            print(f'Phone {self.name} authenticated successful')
             self.bts = bts
             return True
+        print(f'Phone {self.name} authenticated failed')
         return False
 
     def authenticate(self):
@@ -37,36 +38,36 @@ class Phone:
         """
         Calculate SRES for challenge
         """
-        SRES, Kc = auth(self.Ki, RAND)
+        Kc, SRES = auth(self.ki, RAND)
         return SRES
 
-    def make_call(self, phone, received_number):
+    def make_call(self, receiving_number):
         if not self.bts:
             if not self.connect_to_bts(self.search_for_bts()):
                 print(f"Failed to connect to network for {self.name}")
                 return
-        result = self.bts.make_call(phone, received_number)
+        result = self.bts.make_call(self.number, receiving_number)
         if result == False:
             print("Call failed")
     
-    def call_confirm(self, call_data):
-        from_number = call_data.number_make_call
-        if(self.number == from_number): 
-            from_number = call_data.number_receive_call
-        print("Call started with number: {from_number}")
+    def call_confirm(self, from_number):
+        print(f"Call started with number: {from_number}")
     
-    def request_end_call(self, phone):
-        result = self.bts.end_call(phone)
+    def request_end_call(self):
+        result = self.bts.request_end_call(self.number)
         if result == True:
             print("End successful")
         else:
             print("Fail to end call")
     
-    def end_call(self, call_data):
-        from_number = call_data.number_make_call
-        if(self.number == from_number): 
-            from_number = call_data.number_receive_call
-        print("Call with number {from_number} ended")
+    # def end_call(self, call_data):
+    #     from_number = call_data.number_make_call
+    #     if(self.number == from_number): 
+    #         from_number = call_data.number_receive_call
+    #     print("Call with number {from_number} ended")
+    
+    def end_call(self):
+        print("Call ended")
     
     def text(self, number, message):
         if not self.bts:

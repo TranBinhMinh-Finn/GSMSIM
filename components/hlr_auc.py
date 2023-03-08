@@ -1,11 +1,16 @@
+import os, binascii
 from random import randint
 from algorithm.com128 import auth
-from vlr import VLR
+from .vlr import VLR
 
 class HLR_data:
     imsi: int
     serving_vlr: VLR
     Ki: str
+    def __init__(self, imsi, Ki, serving_vlr=None):
+        self.imsi = imsi
+        self.Ki = Ki
+        self.serving_vlr = serving_vlr
 
     
 class HLR:
@@ -13,13 +18,13 @@ class HLR:
         self.ms_db = {}
     
     def search_Ki(self, phone_number):
-        return self.ms_db[phone_number]
+        return self.ms_db[phone_number].Ki
     
     def create_triplet(self, phone_number):
         Ki = self.search_Ki(phone_number)
         if Ki == None:
             return -1
-        RAND = randint(0, 65535)
+        RAND = binascii.b2a_hex(os.urandom(16)).decode("utf-8")  #randint(0, 65535)
         Kc, SRES = auth(Ki, RAND)
         return RAND, Kc, SRES
     
