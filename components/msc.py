@@ -1,6 +1,6 @@
 from components.hlr_auc import HLR
 from components.vlr import VLR, VLR_data, Call_data
-
+from .bsc import BSC
 class MSC:
     def __init__(self, name="", hlr = None):
         self.name = name

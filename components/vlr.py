@@ -1,7 +1,5 @@
 from random import randint
-from bsc import BSC
-from bts import BTS
-from phone import Phone
+from .phone import Phone
 from datetime import datetime
 
 TMSI_GEN_RANGE = 2 ** 32 - 2
@@ -22,8 +20,6 @@ class VLR_data:
     tmsi: int
     is_busy: bool
     call_data: Call_data
-    bsc: BSC 
-    bts: BTS
     number_call: str
     ms: Phone
     
@@ -38,6 +34,7 @@ class VLR:
     def change_status(self, phone_number):
         self.ms_db[phone_number].is_busy = 1 - self.ms_db[phone_number].is_busy
     
+
     def update_call_data(self, phone, make_call_number, received_call_number):
         self.ms_db[phone].call_data = Call_data(make_call_number, received_call_number, None)
         

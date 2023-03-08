@@ -1,8 +1,8 @@
-from vlr import Call_data
+from .vlr import Call_data
+
 from .bts import BTS
 BSC_CAPACITY = 5
 
-BSC_CAPACITY = 5
 class BSC:
     def __init__(self, msc, name="bsc", capacity=BSC_CAPACITY):
         self.msc = msc
@@ -25,8 +25,8 @@ class BSC:
     def request_end_call(self, phone_number):
         return self.msc.request_end_call(phone_number)
     
-    def end_call(self, bts, phone, call_data):
-        bts.end_call(phone, call_data)
+    def end_call(self, bts, phone):
+        bts.end_call(phone)
     
     def send_sms(self, phone, number, message):
         recipient = self.msc.search_phone(number)

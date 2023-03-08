@@ -1,5 +1,4 @@
 from algorithm.com128 import auth
-from vlr import Call_data
 
 class Phone:
     def __init__(self, number, imsi, ki, name=""):
