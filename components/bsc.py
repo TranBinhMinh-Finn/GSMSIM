@@ -19,14 +19,14 @@ class BSC:
     def make_call(self, calling_number, receiving_number):
         return self.msc.make_call(calling_number, receiving_number)
 
-    def call_confirm(self, bts, phone, from_number):
-        bts.call_confirm(phone, from_number)
+    def call_confirm(self, bts, phone, call_data):
+        bts.call_confirm(phone, call_data)
         
     def request_end_call(self, phone_number):
         return self.msc.request_end_call(phone_number)
     
-    def end_call(self, bts, phone):
-        bts.end_call(phone)
+    def end_call(self, bts, phone, call_data):
+        bts.end_call(phone, call_data)
     
     def send_sms(self, phone, number, message):
         recipient = self.msc.search_phone(number)

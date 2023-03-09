@@ -21,7 +21,7 @@ class MSC:
         
     def authenticate(self, phone):
         RAND, Kc, SRES = self.hlr.create_triplet(phone.number)
-        print(RAND, Kc, SRES)
+        #print(RAND, Kc, SRES)
         if RAND == -1:
             #TODO: check hlr of other networks
             return False
@@ -38,30 +38,31 @@ class MSC:
         calling_phone = self.vlr.search_phone(calling_number)
         if receiving_phone == None or calling_phone == None: 
             #TODO: Can't find phone number in current vlr
-            return False
+            return 2
         else:
             if receiving_phone.is_busy == False and calling_phone.is_busy == False:
                 #Call successful
                 self.vlr.change_status(calling_number)
                 self.vlr.change_status(receiving_number)
-                self.vlr.assign_number_call(calling_number, receiving_number)
-                self.vlr.assign_number_call(receiving_number, calling_number)
-                receiving_phone.ms.bts.bsc.call_confirm(receiving_phone.ms.bts, receiving_phone.ms, calling_number)
-                calling_phone.ms.bts.bsc.call_confirm(calling_phone.ms.bts, calling_phone.ms, receiving_number)
+                self.vlr.update_call_data(calling_number, receiving_number)
+                receiving_phone.ms.bts.bsc.call_confirm(receiving_phone.ms.bts, receiving_phone.ms, receiving_phone.call_data)
+                calling_phone.ms.bts.bsc.call_confirm(calling_phone.ms.bts, calling_phone.ms, calling_phone.call_data)
             else:
-                return False
-            return True
+                return 1
+        return 0
     
     def request_end_call(self, phone_number):
         phone_end_call = self.vlr.search_phone(phone_number)
         if(phone_end_call.is_busy == False):
             return False
-        receive_number = phone_end_call.number_call 
+        receive_number = phone_end_call.call_data.number_make_call
+        if receive_number == phone_number:
+            receive_number = phone_end_call.call_data.number_receive_call
         phone_receive_end_call = self.vlr.search_phone(receive_number)
         self.vlr.change_status(phone_number)
         self.vlr.change_status(receive_number)
-        phone_end_call.ms.bts.bsc.end_call(phone_end_call.ms.bts, phone_end_call.ms)
-        phone_receive_end_call.ms.bts.bsc.end_call(phone_receive_end_call.ms.bts, phone_receive_end_call.ms)
+        phone_end_call.ms.bts.bsc.end_call(phone_end_call.ms.bts, phone_end_call.ms, phone_end_call.call_data)
+        phone_receive_end_call.ms.bts.bsc.end_call(phone_receive_end_call.ms.bts, phone_receive_end_call.ms, phone_receive_end_call.call_data)
         return True
         
     
