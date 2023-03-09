@@ -5,6 +5,10 @@ from datetime import datetime
 TMSI_GEN_RANGE = 2 ** 32 - 2
 
 class Call_data:
+    def __init__(self, number_make_call, number_receive_call, start_time):
+        self.number_make_call = number_make_call
+        self.number_receive_call = number_receive_call
+        self.start_time = start_time
     number_make_call: str
     number_receive_call: str
     start_time: datetime
@@ -16,11 +20,11 @@ class VLR_data:
         self.ms = ms
         self.is_busy = False
         self.number_call = None
+        self.call_data = None
     imsi: int
     tmsi: int
     is_busy: bool
     call_data: Call_data
-    number_call: str
     ms: Phone
     
 class VLR:
@@ -33,13 +37,11 @@ class VLR:
         
     def change_status(self, phone_number):
         self.ms_db[phone_number].is_busy = 1 - self.ms_db[phone_number].is_busy
-    
 
-    def update_call_data(self, phone, make_call_number, received_call_number):
-        self.ms_db[phone].call_data = Call_data(make_call_number, received_call_number, None)
-        
-    def assign_number_call(self, phone_number, call_number):
-        self.ms_db[phone_number].number_call = call_number
+    def update_call_data(self, make_call_number, received_call_number):
+        current_time = datetime.now()
+        self.ms_db[make_call_number].call_data = Call_data(make_call_number, received_call_number, current_time)
+        self.ms_db[received_call_number].call_data = Call_data(make_call_number, received_call_number, current_time)
     
     def generate_tmsi(self):
         tmsi = randint(0, TMSI_GEN_RANGE)
