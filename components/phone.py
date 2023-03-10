@@ -66,12 +66,6 @@ class Phone:
         else:
             print(f"Fail to end call from {self.number}")
     
-    # def end_call(self, call_data):
-    #     from_number = call_data.number_make_call
-    #     if(self.number == from_number): 
-    #         from_number = call_data.number_receive_call
-    #     print("Call with number {from_number} ended")
-    
     def end_call(self, call_data):
         number_call = call_data.number_make_call
         end_time = datetime.now()

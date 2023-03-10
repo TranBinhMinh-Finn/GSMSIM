@@ -2,6 +2,7 @@ import os,binascii
 from .msc import MSC
 from .hlr_auc import HLR, HLR_data
 from .phone import Phone
+from utils import network_db
 
 class Network:
    
@@ -10,9 +11,10 @@ class Network:
         self.mnc = mnc # mobile network code
         self.cc = cc # country code
         self.ndc = ndc # national destination code
-        self.hlr = HLR()
+        self.hlr = HLR(mcc, mnc, cc, ndc)
         self.msc = MSC(hlr=self.hlr)
         self.ms_count = 0
+        network_db[(mcc, mnc)] = self.hlr
         
     def add_bts(self):
         return self.msc.add_bts()
