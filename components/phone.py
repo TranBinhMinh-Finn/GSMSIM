@@ -53,11 +53,23 @@ class Phone:
         if result == 2: 
             print(f"{self.number}: Receiver doesn't exist")
     
-    def call_confirm(self, call_data):
+    def call_connect(self, call_data):
         number_call = call_data.number_make_call
         if self.number == number_call:
             number_call = call_data.number_receive_call
         print(f"{self.number}: Call started with number: {number_call}")
+    
+    def call_confirm(self, from_number):
+        print(f"{self.number}: Receiving call from {from_number}")
+        print(f"{self.number}: Press Y to accept, N to decline: Y/N?")
+        s = input()
+        while s != 'Y' and s != 'N':
+            print(f"{self.number}: Type again: (Y/N)")
+            s = input()
+        if s == 'Y':
+            return True
+        else: 
+            return False
     
     def request_end_call(self):
         result = self.bts.request_end_call(self.number)

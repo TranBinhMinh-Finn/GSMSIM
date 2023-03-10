@@ -58,12 +58,15 @@ class MSC:
             receiving_vlr = self.vlr
         if receiving_phone.is_busy == False and calling_phone.is_busy == False:
             #Call successful
-            self.vlr.change_status(calling_number)
-            receiving_vlr.change_status(receiving_number)
-            self.vlr.update_call_data(calling_number, receiving_number)
-            receiving_vlr.update_call_data(receiving_number, calling_number)
-            receiving_phone.ms.bts.bsc.call_confirm(receiving_phone.ms.bts, receiving_phone.ms, receiving_phone.call_data)
-            calling_phone.ms.bts.bsc.call_confirm(calling_phone.ms.bts, calling_phone.ms, calling_phone.call_data)
+            if receiving_phone.ms.bts.bsc.call_confirm(receiving_phone.ms.bts, receiving_phone.ms, calling_number) == True:
+                self.vlr.change_status(calling_number)
+                receiving_vlr.change_status(receiving_number)
+                self.vlr.update_call_data(calling_number, receiving_number)
+                receiving_vlr.update_call_data(receiving_number, calling_number)
+                receiving_phone.ms.bts.bsc.call_connect(receiving_phone.ms.bts, receiving_phone.ms, receiving_phone.call_data)
+                calling_phone.ms.bts.bsc.call_connect(calling_phone.ms.bts, calling_phone.ms, calling_phone.call_data)
+            else: 
+                return 1
         else:
             return 1
         return 0

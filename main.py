@@ -30,9 +30,10 @@ for bsc in network.msc.bsc_list:
             break
     
 phone_list[0].make_call(phone_list[1].number)
-time.sleep(10)
+time.sleep(5)
 phone_list[1].request_end_call()
 phone_list[0].make_call(phone_list[2].number)
 phone_list[1].make_call(phone_list[2].number)
-time.sleep(23)
+time.sleep(5)
 phone_list[0].request_end_call()
+phone_list[2].request_end_call()

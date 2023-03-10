@@ -19,9 +19,12 @@ class BSC:
     def make_call(self, calling_number, receiving_number):
         return self.msc.make_call(calling_number, receiving_number)
 
-    def call_confirm(self, bts, phone, call_data):
-        bts.call_confirm(phone, call_data)
+    def call_connect(self, bts, phone, call_data):
+        bts.call_connect(phone, call_data)
         
+    def call_confirm(self, bts, phone, from_number):
+        return bts.call_confirm(phone, from_number)
+    
     def request_end_call(self, phone_number):
         return self.msc.request_end_call(phone_number)
     
