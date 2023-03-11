@@ -5,13 +5,13 @@ from datetime import datetime
 TMSI_GEN_RANGE = 2 ** 32 - 2
 
 class Call_data:
-    def __init__(self, number_make_call, number_receive_call, start_time):
-        self.number_make_call = number_make_call
-        self.number_receive_call = number_receive_call
+    def __init__(self, first_number, second_number, start_time, first_vlr, second_vlr):
+        self.first_number = first_number
+        self.first_vlr = first_vlr
+        self.second_number = second_number
+        self.second_vlr = second_vlr
         self.start_time = start_time
-    number_make_call: str
-    number_receive_call: str
-    start_time: datetime
+    
 
 class VLR_data:
     def __init__(self, imsi, tmsi, ms):
@@ -33,14 +33,14 @@ class VLR:
         self.assigned_tmsi=[]
         
     def search_phone(self, phone_number):
-        return self.ms_db[phone_number]
+        return self.ms_db.get(phone_number)
         
     def change_status(self, phone_number):
         self.ms_db[phone_number].is_busy = 1 - self.ms_db[phone_number].is_busy
 
-    def update_call_data(self, first_number, second_number):
+    def update_call_data(self, first_number, second_number, first_vlr, second_vlr):
         current_time = datetime.now()
-        self.ms_db[first_number].call_data = Call_data(first_number, second_number, current_time)
+        self.ms_db[first_number].call_data = Call_data(first_number, second_number, current_time, first_vlr, second_vlr)
     
     def generate_tmsi(self):
         tmsi = randint(0, TMSI_GEN_RANGE)

@@ -54,9 +54,7 @@ class Phone:
             print(f"{self.number}: Receiver doesn't exist")
     
     def call_connect(self, call_data):
-        number_call = call_data.number_make_call
-        if self.number == number_call:
-            number_call = call_data.number_receive_call
+        number_call = call_data.second_number
         print(f"{self.number}: Call started with number: {number_call}")
     
     def call_confirm(self, from_number):
@@ -79,10 +77,8 @@ class Phone:
             print(f"Fail to end call from {self.number}")
     
     def end_call(self, call_data):
-        number_call = call_data.number_make_call
+        number_call = call_data.second_number
         end_time = datetime.now()
-        if number_call == self.number:
-            number_call = call_data.number_receive_call
         print(f"{self.number}: Call with number {number_call} ended in {end_time - call_data.start_time}")
     
     def text(self, number, message):

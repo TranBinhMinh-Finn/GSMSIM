@@ -32,6 +32,9 @@ class HLR:
         Kc, SRES = auth(Ki, RAND)
         return RAND, Kc, SRES
     
+    def search_phone(self, phone_number):
+        return self.ms_db.get(phone_number)
+    
     def add_ms(self, phone_number, data):
         self.ms_db[phone_number] = data
         
@@ -39,4 +42,4 @@ class HLR:
         self.ms_db.pop(phone_number)
         
     def update_vlr(self, phone_number, vlr):
-        self.ms_db[phone_number].vlr = vlr
+        self.ms_db[phone_number].serving_vlr = vlr
