@@ -14,8 +14,12 @@ class HLR_data:
 
     
 class HLR:
-    def __init__(self):
+    def __init__(self, mcc, mnc, cc, ndc):
         self.ms_db = {}
+        self.mcc = mcc # mobile country code
+        self.mnc = mnc # mobile network code
+        self.cc = cc # country code
+        self.ndc = ndc # national destination code
     
     def search_Ki(self, phone_number):
         return self.ms_db[phone_number].Ki
@@ -28,6 +32,9 @@ class HLR:
         Kc, SRES = auth(Ki, RAND)
         return RAND, Kc, SRES
     
+    def search_phone(self, phone_number):
+        return self.ms_db.get(phone_number)
+    
     def add_ms(self, phone_number, data):
         self.ms_db[phone_number] = data
         
@@ -35,4 +42,4 @@ class HLR:
         self.ms_db.pop(phone_number)
         
     def update_vlr(self, phone_number, vlr):
-        self.ms_db[phone_number].vlr = vlr
+        self.ms_db[phone_number].serving_vlr = vlr

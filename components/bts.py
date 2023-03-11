@@ -13,8 +13,11 @@ class BTS:
     def make_call(self, calling_number, receiving_number):
         return self.bsc.make_call(calling_number, receiving_number)
         
-    def call_confirm(self, phone, call_data):
-        phone.call_confirm(call_data)
+    def call_connect(self, phone, call_data):
+        phone.call_connect(call_data)
+        
+    def call_confirm(self, phone, from_number): 
+        return phone.call_confirm(from_number)
         
     def request_end_call(self, phone_number):
         return self.bsc.request_end_call(phone_number)
