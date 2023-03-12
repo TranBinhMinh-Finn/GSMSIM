@@ -18,22 +18,12 @@ class Phone:
         return bts
     
     def connect_to_bts(self, bts):
-        if bts.authenticate(self):
-            print(f'Phone {self.number} authenticated successful')
+        if bts.handle_connection_request(self):
+            print(f'Phone {self.number} connected successfully')
             self.bts = bts
             return True
-        print(f'Phone {self.number} authenticated failed')
+        print(f'Phone {self.number} failed to connect')
         return False
-
-    def authenticate(self):
-        if self.bts.authenticate(self):
-            """
-            Send a request to authenticate phone with network  
-            """
-            return True
-        else:
-            print(f"Authentication failed for {self.number}")
-            return False
 
     def cal_SRES(self, RAND):
         """
@@ -52,6 +42,8 @@ class Phone:
             print(f"{self.number}: Receiver is busy")
         if result == 2: 
             print(f"{self.number}: Receiver doesn't exist")
+        if result == -1:
+            print(f"{self.number}: Line busy")
     
     def call_connect(self, call_data):
         number_call = call_data.second_number

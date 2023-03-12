@@ -38,8 +38,8 @@ class BSC:
         else:
             print(f"Phone number {number} not found.")
             
-    def authenticate(self, phone):
+    def handle_connection_request(self, phone):
         """
-        Pass the authentication request to MSC
+        Pass the connection request to MSC
         """
         return self.msc.authenticate(phone)
