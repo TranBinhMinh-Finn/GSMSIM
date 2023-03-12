@@ -11,6 +11,7 @@ class Phone:
         self.lai = None
         self.imsi = imsi
         self.tmsi = None
+        self.from_number = None
 
     def search_for_bts(self):
         bts = None
@@ -18,22 +19,12 @@ class Phone:
         return bts
     
     def connect_to_bts(self, bts):
-        if bts.authenticate(self):
-            print(f'Phone {self.number} authenticated successful')
+        if bts.handle_connection_request(self):
+            print(f'Phone {self.number} connected successfully')
             self.bts = bts
             return True
-        print(f'Phone {self.number} authenticated failed')
+        print(f'Phone {self.number} failed to connect')
         return False
-
-    def authenticate(self):
-        if self.bts.authenticate(self):
-            """
-            Send a request to authenticate phone with network  
-            """
-            return True
-        else:
-            print(f"Authentication failed for {self.number}")
-            return False
 
     def cal_SRES(self, RAND):
         """
@@ -45,36 +36,44 @@ class Phone:
     def make_call(self, receiving_number):
         if not self.bts:
             if not self.connect_to_bts(self.search_for_bts()):
-                print(f"Failed to connect to network for {self.number}")
+                print(f"Failed to connect to network.")
                 return
         result = self.bts.make_call(self.number, receiving_number)
         if result == 1:
-            print(f"{self.number}: Receiver is busy")
+            print(f"Receiver is busy.")
         if result == 2: 
-            print(f"{self.number}: Receiver doesn't exist")
+            print(f"Receiver doesn't exist")
+        if result == -1:
+            print(f"Line busy")
     
     def call_connect(self, call_data):
         number_call = call_data.second_number
-        print(f"{self.number}: Call started with number: {number_call}")
+        print(f"{self.number}: Call started with number: {number_call}.")
     
-    def call_confirm(self, from_number):
-        print(f"{self.number}: Receiving call from {from_number}")
-        print(f"{self.number}: Press Y to accept, N to decline: Y/N?")
+    def call_alert(self):
+        from_number = self.bts.call_alert(self.number)
+        if from_number != None: 
+            print(f"Receiving call from {from_number}")
+        self.from_number = from_number
+    
+    def call_confirm(self):
+        print(f"Press Y to accept, N to decline: Y/N?")
         s = input()
         while s != 'Y' and s != 'N':
             print(f"{self.number}: Type again: (Y/N)")
             s = input()
         if s == 'Y':
-            return True
+            self.bts.call_confirm(self.number, self.from_number, True)
         else: 
-            return False
+            self.bts.call_confirm(self.number, self.from_number, False)
+        self.from_number = None
     
     def request_end_call(self):
         result = self.bts.request_end_call(self.number)
         if result == True:
-            print(f"End successful from {self.number}")
+            print(f"End successful.")
         else:
-            print(f"Fail to end call from {self.number}")
+            print(f"Fail to end call.")
     
     def end_call(self, call_data):
         number_call = call_data.second_number
