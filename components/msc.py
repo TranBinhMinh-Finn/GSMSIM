@@ -21,6 +21,9 @@ class MSC:
         self.bsc_list[-1].add_bts()
         
     def authenticate(self, phone):
+        """
+        Authenticate the requesting MS and update the vlr if successful
+        """
         mcc = phone.imsi[:3]
         mnc = phone.imsi[3:5]
             
@@ -65,8 +68,8 @@ class MSC:
                 return 2
         else:
             receiving_vlr = self.vlr
-        if receiving_phone.is_busy == False and calling_phone.is_busy == False:
-            #Call successful
+        if receiving_phone.is_busy == False and calling_phone.is_busy == False: # Both ms are not in a call
+            # Assign traffic channel
             if receiving_phone.ms.bts.bsc.call_confirm(receiving_phone.ms.bts, receiving_phone.ms, calling_number) == True:
                 self.vlr.change_status(calling_number)
                 receiving_vlr.change_status(receiving_number)
