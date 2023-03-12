@@ -25,6 +25,7 @@ class VLR_data:
     tmsi: int
     is_busy: bool
     call_data: Call_data
+    phone_calling: str
     ms: Phone
     
 class VLR:

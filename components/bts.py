@@ -29,9 +29,12 @@ class BTS:
         
     def call_connect(self, phone, call_data):
         phone.call_connect(call_data)
-        
-    def call_confirm(self, phone, from_number): 
-        return phone.call_confirm(from_number)
+    
+    def call_alert(self, phone_number):
+        return self.bsc.call_alert(phone_number)
+    
+    def call_confirm(self, first_number, second_number, confirm): 
+        return self.bsc.call_confirm(first_number, second_number, confirm)
         
     def request_end_call(self, phone_number):
         return self.bsc.request_end_call(phone_number)

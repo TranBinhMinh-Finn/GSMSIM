@@ -45,43 +45,52 @@ class MSC:
             return True
         return False
 
+    def find_vlr_data(self, number):
+        if len(number) >= 4:
+            cc = number[:2]
+            ndc = number[2:4]
+            network_code =  network_code_mappings.get((cc, ndc))
+            if network_code != None:
+                hlr = network_db.get(network_code)
+                if hlr != None:
+                    if hlr.search_phone(number) != None:
+                        vlr = hlr.ms_db[number].serving_vlr
+                        phone = vlr.search_phone(number)
+                        if phone != None: 
+                            return (vlr, phone)
+        return (None, None) # Can't find phone in other hlr
+
     def make_call(self, calling_number, receiving_number):
         # get phone data of both numbers 
-        receiving_phone = self.vlr.search_phone(receiving_number)
+        (receiving_vlr, receiving_phone) = self.find_vlr_data(receiving_number)
         calling_phone = self.vlr.search_phone(calling_number)
-        if receiving_phone == None: # Can't find phone number in current vlr
-            # Search the ms in receiving number's hlr
-            cc = receiving_number[:2]
-            ndc = receiving_number[2:4]
-            network_code =  network_code_mappings.get((cc, ndc))
-            if network_code == None:
-                return 2
-            hlr = network_db.get(network_code)
-            if hlr == None:
-                return 2
-            if hlr.search_phone(receiving_number) != None:
-                receiving_vlr = hlr.ms_db[receiving_number].serving_vlr
-                receiving_phone = receiving_vlr.search_phone(receiving_number)
-                if receiving_phone == None: # Can't find phone in other hlr
-                    return 2
-            else:
-                return 2
+        if receiving_phone == None: # Can't find receive phone number
+            return 2
+        if receiving_phone.is_busy == False and calling_phone.is_busy == False:
+            self.vlr.change_status(calling_number)
+            receiving_vlr.change_status(receiving_number)
+            receiving_phone.phone_calling = calling_number
+            return 0
+            #Call successful
         else:
-            receiving_vlr = self.vlr
-        if receiving_phone.is_busy == False and calling_phone.is_busy == False: # Both ms are not in a call
-            # Assign traffic channel
-            if receiving_phone.ms.bts.bsc.call_confirm(receiving_phone.ms.bts, receiving_phone.ms, calling_number) == True:
-                self.vlr.change_status(calling_number)
-                receiving_vlr.change_status(receiving_number)
-                self.vlr.update_call_data(calling_number, receiving_number, self.vlr, receiving_vlr)
-                receiving_vlr.update_call_data(receiving_number, calling_number, receiving_vlr, self.vlr)
-                receiving_phone.ms.bts.bsc.call_connect(receiving_phone.ms.bts, receiving_phone.ms, receiving_phone.call_data)
-                calling_phone.ms.bts.bsc.call_connect(calling_phone.ms.bts, calling_phone.ms, calling_phone.call_data)
-            else: 
-                return 1
-        else:
-            return 1
-        return 0
+            return 1 # Receiver is busy
+    
+    def call_alert(self, phone_number):
+        phone = self.vlr.search_phone(phone_number)
+        return phone.phone_calling
+    
+    def call_confirm(self, first_number, second_number, confirm):
+        first_vlr, first_phone = self.find_vlr_data(first_number)
+        second_vlr, second_phone = self.find_vlr_data(second_number)
+        if confirm == True:
+            first_vlr.update_call_data(first_number, second_number, first_vlr, second_vlr)
+            second_vlr.update_call_data(second_number, first_number, second_vlr, first_vlr)
+            first_phone.ms.bts.bsc.call_connect(second_phone.ms.bts, second_phone.ms, second_phone.call_data)
+            second_phone.ms.bts.bsc.call_connect(first_phone.ms.bts, first_phone.ms, first_phone.call_data)
+        else: 
+            first_vlr.change_status(first_number)
+            second_vlr.change_status(second_number)
+        first_phone.phone_calling = None
     
     def request_end_call(self, first_number):
         first_ms = self.vlr.search_phone(first_number)
