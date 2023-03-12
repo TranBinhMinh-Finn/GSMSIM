@@ -93,12 +93,16 @@ class MSC:
             second_vlr.change_status(second_number)
         first_phone.phone_calling = None
     
-    def request_end_call(self, first_number):
+    def request_end_call(self, first_number, second_number, in_call):
         first_ms = self.vlr.search_phone(first_number)
-        if(first_ms.is_busy == False):
+        if first_ms.is_busy == False:
             return False
-        second_number = first_ms.call_data.second_number
-        second_vlr = first_ms.call_data.second_vlr
+        second_vlr, second_ms = self.find_vlr_data(second_number)
+        if in_call == False:
+            self.vlr.change_status(first_number)
+            second_vlr.change_status(second_number)
+            second_ms.phone_calling = None
+            return True
         second_ms = second_vlr.search_phone(second_number)
         if second_ms == None: # Can't find phone in current vlr
             self.vlr.change_status(first_number)

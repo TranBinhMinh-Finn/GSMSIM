@@ -31,8 +31,8 @@ class BSC:
     def call_confirm(self, first_number, second_number, confirm):
         self.msc.call_confirm(first_number, second_number, confirm)
     
-    def request_end_call(self, phone_number):
-        return self.msc.request_end_call(phone_number)
+    def request_end_call(self, first_number, second_number, in_call):
+        return self.msc.request_end_call(first_number, second_number, in_call)
     
     def end_call(self, bts, phone, call_data):
         bts.end_call(phone, call_data)

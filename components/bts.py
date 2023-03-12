@@ -39,8 +39,8 @@ class BTS:
     def call_confirm(self, first_number, second_number, confirm): 
         return self.bsc.call_confirm(first_number, second_number, confirm)
         
-    def request_end_call(self, phone_number):
-        return self.bsc.request_end_call(phone_number)
+    def request_end_call(self, first_number, second_number, in_call):
+        return self.bsc.request_end_call(first_number, second_number, in_call)
     
     def end_call(self, phone, call_data):
         self.channels_in_use -= 1

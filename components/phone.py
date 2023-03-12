@@ -99,7 +99,8 @@ class Phone:
         self.from_number = None
     
     def request_end_call(self):
-        result = self.bts.request_end_call(self.number)
+        result = self.bts.request_end_call(self.number, self.to_number, self.in_call)
+        self.wait_confirm = False
         if result == True:
             print(f"End successful.")
         else:
