@@ -82,11 +82,12 @@ while True:
                     print(f"Wrong phone number. Type again.")
                     continue
             # check receive call
-            phone.call_alert()
-            if(phone.from_number != None): 
-                phone.call_confirm()
             #print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: connect network")
             while True:
+                phone.call_alert()
+                if(phone.from_number != None): 
+                    phone.call_confirm()
+                phone.check_state()
                 print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: connect network)")
                 action = input()
                 if action == "0":

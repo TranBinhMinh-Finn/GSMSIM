@@ -85,9 +85,10 @@ class MSC:
         if confirm == True:
             first_vlr.update_call_data(first_number, second_number, first_vlr, second_vlr)
             second_vlr.update_call_data(second_number, first_number, second_vlr, first_vlr)
-            first_phone.ms.bts.bsc.call_connect(second_phone.ms.bts, second_phone.ms, second_phone.call_data)
-            second_phone.ms.bts.bsc.call_connect(first_phone.ms.bts, first_phone.ms, first_phone.call_data)
+            second_phone.ms.bts.bsc.call_connect(second_phone.ms.bts, second_phone.ms, second_phone.call_data)
+            first_phone.ms.bts.bsc.call_connect(first_phone.ms.bts, first_phone.ms, first_phone.call_data)
         else: 
+            second_phone.ms.bts.bsc.call_decline(second_phone.ms.bts, second_phone.ms)
             first_vlr.change_status(first_number)
             second_vlr.change_status(second_number)
         first_phone.phone_calling = None

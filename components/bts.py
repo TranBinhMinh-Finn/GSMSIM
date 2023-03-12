@@ -30,6 +30,9 @@ class BTS:
     def call_connect(self, phone, call_data):
         phone.call_connect(call_data)
     
+    def call_decline(self, phone):
+        phone.call_decline()
+    
     def call_alert(self, phone_number):
         return self.bsc.call_alert(phone_number)
     

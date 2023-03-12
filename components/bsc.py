@@ -21,6 +21,9 @@ class BSC:
 
     def call_connect(self, bts, phone, call_data):
         bts.call_connect(phone, call_data)
+    
+    def call_decline(self, bts, phone):
+        bts.call_decline(phone)
         
     def call_alert(self, phone_number):
         return self.msc.call_alert(phone_number)
