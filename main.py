@@ -79,9 +79,6 @@ def ms_interface():
     # check receive call
     #print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: connect network")
     while True:
-        phone.call_alert()
-        if(phone.from_number != None): 
-            phone.call_confirm()
         phone.check_state()
         print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: connect network)")
         action = input()
@@ -100,6 +97,18 @@ def ms_interface():
             continue
         print(f"Type again.")
     
+def bts_interface():
+    print(f"Input number of BTS, or enter 0 to return: ")
+    
+def bsc_interface():
+    print(f"Input number of BSC, or enter 0 to return: ")
+        
+def msc_interface():
+    print(f"Input number of MSC, or enter 0 to return: ")
+
+def network_interface():
+    print(f"Input number of network, or enter 0 to return: ")
+
 while True:
     print(f"Access to :(1: network / 2: msc / 3: bsc / 4: bts / 5: ms)")
     s = input()

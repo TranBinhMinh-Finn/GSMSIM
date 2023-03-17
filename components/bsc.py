@@ -25,8 +25,8 @@ class BSC:
     def call_decline(self, bts, phone):
         bts.call_decline(phone)
         
-    def call_alert(self, phone_number):
-        return self.msc.call_alert(phone_number)
+    def call_alert(self, phone, bts, from_number):
+        return bts.call_alert(phone, from_number)
     
     def call_confirm(self, first_number, second_number, confirm):
         self.msc.call_confirm(first_number, second_number, confirm)
@@ -34,8 +34,8 @@ class BSC:
     def request_end_call(self, first_number, second_number, in_call):
         return self.msc.request_end_call(first_number, second_number, in_call)
     
-    def end_call(self, bts, phone, call_data):
-        bts.end_call(phone, call_data)
+    def end_call(self, bts, phone):
+        bts.end_call(phone)
     
     def send_sms(self, phone, number, message):
         recipient = self.msc.search_phone(number)

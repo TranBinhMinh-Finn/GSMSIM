@@ -70,14 +70,11 @@ class MSC:
             self.vlr.change_status(calling_number)
             receiving_vlr.change_status(receiving_number)
             receiving_phone.phone_calling = calling_number
+            receiving_phone.ms.bts.bsc.call_alert(receiving_phone.ms, receiving_phone.ms.bts , calling_number)
             return 0
             #Call successful
         else:
             return 1 # Receiver is busy
-    
-    def call_alert(self, phone_number):
-        phone = self.vlr.search_phone(phone_number)
-        return phone.phone_calling
     
     def call_confirm(self, first_number, second_number, confirm):
         first_vlr, first_phone = self.find_vlr_data(first_number)
@@ -91,7 +88,6 @@ class MSC:
             second_phone.ms.bts.bsc.call_decline(second_phone.ms.bts, second_phone.ms)
             first_vlr.change_status(first_number)
             second_vlr.change_status(second_number)
-        first_phone.phone_calling = None
     
     def request_end_call(self, first_number, second_number, in_call):
         first_ms = self.vlr.search_phone(first_number)

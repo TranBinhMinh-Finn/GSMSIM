@@ -12,11 +12,13 @@ class Phone:
         self.imsi = imsi
         self.tmsi = None
         self.in_call = False
+        self.from_number = None
         self.to_number = None
         self.wait_confirm = False
         self.decline = False
         self.call_data = None
         self.end_time = None
+        self.wait_call = False
 
     def search_for_bts(self):
         bts = None
@@ -68,13 +70,13 @@ class Phone:
         self.decline = True
         self.wait_confirm = False
     
-    def call_alert(self):
-        from_number = self.bts.call_alert(self.number)
+    def call_alert(self, from_number):
         self.from_number = from_number
-        if self.from_number != None: 
-            print(f"Receiving call from {self.from_number}")
     
     def check_state(self):
+        if self.from_number != None: 
+            print(f"Receiving call from {self.from_number}")
+            self.call_confirm()
         if self.in_call == True and self.wait_confirm == False:
             print(f"In a call with {self.to_number}.")
         if self.in_call == False and self.wait_confirm == True:
@@ -106,7 +108,7 @@ class Phone:
         else:
             print(f"Fail to end call.")
     
-    def end_call(self, call_data):
+    def end_call(self):
         #number_call = call_data.second_number
         self.in_call = False
         self.end_time = datetime.now()

@@ -4,6 +4,7 @@ DEFAULT_CHANNELS = 14
 class BTS:
     def __init__(self, bsc, name = "bts", capacity = DEFAULT_CAPACITY, traffic_channels = DEFAULT_CHANNELS):
         self.name = name
+        self.id = id
         self.bsc = bsc
         self.capacity = capacity
         self.traffic_channels = traffic_channels
@@ -33,8 +34,8 @@ class BTS:
     def call_decline(self, phone):
         phone.call_decline()
     
-    def call_alert(self, phone_number):
-        return self.bsc.call_alert(phone_number)
+    def call_alert(self, phone, from_number):
+        return phone.call_alert(from_number)
     
     def call_confirm(self, first_number, second_number, confirm): 
         return self.bsc.call_confirm(first_number, second_number, confirm)
@@ -42,9 +43,9 @@ class BTS:
     def request_end_call(self, first_number, second_number, in_call):
         return self.bsc.request_end_call(first_number, second_number, in_call)
     
-    def end_call(self, phone, call_data):
+    def end_call(self, phone):
         self.channels_in_use -= 1
-        phone.end_call(call_data)
+        phone.end_call()
     
     def send_sms(self, phone, number, message):
         self.bsc.send_sms(phone, number, message)
