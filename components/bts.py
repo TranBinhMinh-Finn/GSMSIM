@@ -18,7 +18,7 @@ class BTS:
         if len(self.ms_list) >= self.capacity:
             return False
         
-        if self.bsc.handle_connection_request(phone):
+        if self.bsc.handle_connection_request(self, phone):
             self.ms_list.append(phone)
             return True
         return False
@@ -49,3 +49,6 @@ class BTS:
     
     def send_sms(self, phone, number, message):
         self.bsc.send_sms(phone, number, message)
+        
+    def auth_challenge(self, phone, RAND):
+        return phone.cal_SRES(RAND)

@@ -20,7 +20,7 @@ class MSC:
         self.add_bsc()
         self.bsc_list[-1].add_bts()
         
-    def authenticate(self, phone):
+    def authenticate(self, bsc, bts, phone):
         """
         Authenticate the requesting MS and update the vlr if successful
         """
@@ -37,7 +37,7 @@ class MSC:
             current_hlr = self.hlr
             RAND, Kc, SRES = current_hlr.create_triplet(phone.number)
             
-        if SRES == phone.cal_SRES(RAND): # phone authenticate sucessfully
+        if SRES == bsc.auth_challenge(bts, phone, RAND): # phone authenticate sucessfully
             # assign tmsi
             phone.tmsi = self.vlr.generate_tmsi()
             self.vlr.add_ms(phone.number, VLR_data(imsi=phone.imsi, tmsi=phone.tmsi, ms=phone))
