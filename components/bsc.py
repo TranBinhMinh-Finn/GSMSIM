@@ -44,8 +44,11 @@ class BSC:
         else:
             print(f"Phone number {number} not found.")
             
-    def handle_connection_request(self, phone):
+    def handle_connection_request(self, bts, phone):
         """
         Pass the connection request to MSC
         """
-        return self.msc.authenticate(phone)
+        return self.msc.authenticate(self, bts, phone)
+    
+    def auth_challenge(self, bts, phone, RAND):
+        return bts.auth_challenge(phone, RAND)
