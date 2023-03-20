@@ -64,7 +64,6 @@ class Phone:
         self.to_number = number_call
         self.wait_confirm = False
         self.wait_call = False
-        #print(f"{self.number}: Call started with number: {number_call}.")
     
     def call_decline(self):
         self.decline = True
@@ -109,10 +108,8 @@ class Phone:
             print(f"Fail to end call.")
     
     def end_call(self):
-        #number_call = call_data.second_number
         self.in_call = False
         self.end_time = datetime.now()
-        #print(f"{self.number}: Call with number {number_call} ended in {end_time - call_data.start_time}")
     
     def text(self, number, message):
         if not self.bts:

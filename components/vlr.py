@@ -39,9 +39,8 @@ class VLR:
     def change_status(self, phone_number):
         self.ms_db[phone_number].is_busy = 1 - self.ms_db[phone_number].is_busy
 
-    def update_call_data(self, first_number, second_number, first_vlr, second_vlr):
-        current_time = datetime.now()
-        self.ms_db[first_number].call_data = Call_data(first_number, second_number, current_time, first_vlr, second_vlr)
+    def update_call_data(self, first_number, second_number, first_vlr, second_vlr, start_time = datetime.now()):
+        self.ms_db[first_number].call_data = Call_data(first_number, second_number, start_time, first_vlr, second_vlr)
     
     def generate_tmsi(self):
         tmsi = randint(0, TMSI_GEN_RANGE)

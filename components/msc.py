@@ -3,8 +3,7 @@ from components.vlr import VLR, VLR_data, Call_data
 from .bsc import BSC
 from utils import network_db, network_code_mappings
 class MSC:
-    def __init__(self, name="", hlr = None):
-        self.name = name
+    def __init__(self, hlr):
         self.hlr = hlr
         self.vlr = VLR()
         self.eir = {}
@@ -69,8 +68,9 @@ class MSC:
         if receiving_phone.is_busy == False and calling_phone.is_busy == False:
             self.vlr.change_status(calling_number)
             receiving_vlr.change_status(receiving_number)
-            receiving_phone.phone_calling = calling_number
-            receiving_phone.ms.bts.bsc.call_alert(receiving_phone.ms, receiving_phone.ms.bts , calling_number)
+            self.vlr.update_call_data(calling_number, receiving_number, self.vlr, receiving_vlr)
+            receiving_vlr.update_call_data(receiving_number, calling_number, receiving_vlr, self.vlr)
+            receiving_phone.ms.bts.bsc.call_alert(receiving_phone.ms, receiving_phone.ms.bts, calling_number)
             return 0
             #Call successful
         else:
