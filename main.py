@@ -7,7 +7,9 @@ from components.network import Network
 import time
 from utils import network_db, network_code_mappings
 
+network_list = {}
 network = Network("452", "01", "84", "91")
+network_list[(network.mcc, network.mnc)] = network
 network.add_bts()
 phone_list = [] 
 phone_list.append(network.create_new_ms())
@@ -24,6 +26,7 @@ for bsc in network.msc.bsc_list.values():
             break
 
 network = Network("452", "02", "84", "98")
+network_list[(network.mcc, network.mnc)] = network
 network.add_bts()
         
 phone_list.append(network.create_new_ms())
@@ -96,27 +99,42 @@ def ms_interface():
             phone.connect_to_bts(phone.search_for_bts())
             continue
         print(f"Type again.")
-    
-def bts_interface():
-    print(f"Input number of BTS, or enter 0 to return: ")
-    
-def bsc_interface():
-    print(f"Input number of BSC, or enter 0 to return: ")
-        
-def msc_interface():
-    print(f"Input number of MSC, or enter 0 to return: ")
 
 def network_interface():
-    print(f"Input number of network, or enter 0 to return: ")
+    while True:
+        print(f"Input mcc and mnc number of network, or enter 0 to return: ")
+        print(f"Mobile country code (mcc):")
+        mcc = input()
+        print(f"Mobile network code (mnc):")
+        mnc = input()
+        current_network = network_list.get((mcc, mnc))
+        if current_network == None: 
+            print(f"This network doesn't exist, type again.")
+            continue
+        else:
+            while True:
+                print(f"In this network, choose: (0: return / 1: create new ms / )")
+                action = input()
+                if action == "0":
+                    return
+                if action == "1":
+                    phone = current_network.create_new_ms()
+                    print(f"Ms number {phone.number} has been created")
+                    continue
+            #return
+
+    
 
 while True:
-    print(f"Access to :(1: network / 2: msc / 3: bsc / 4: bts / 5: ms)")
+    print(f"Access to :(1: network / 2: ms)")
     s = input()
-    while s != "1" and s != "2" and s != "3" and s != "4" and s != "5":
-        print(f"Type again: (1: network / 2: msc / 3: bsc / 4: bts / 5: ms)")
+    while s != "1" and s != "2":
+        print(f"Type again: (1: network / 2: ms)")
         s = input()
-    if s == "5":
+    if s == "2":
         ms_interface()
+    if s == "1":
+        network_interface()
         
             
              

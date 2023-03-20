@@ -4,8 +4,7 @@ from .bsc import BSC
 import os,binascii
 from utils import network_db, network_code_mappings
 class MSC:
-    def __init__(self, name="", hlr = None):
-        self.name = name
+    def __init__(self, hlr):
         self.hlr = hlr
         self.vlr = VLR(msc=self)
         self.eir = {}
