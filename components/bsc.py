@@ -4,11 +4,14 @@ from .bts import BTS
 BSC_CAPACITY = 5
 
 class BSC:
-    def __init__(self, msc, name="bsc", capacity=BSC_CAPACITY):
+    def __init__(self, msc, lac, name="bsc", capacity=BSC_CAPACITY):
         self.msc = msc
         self.name = name
         self.capacity = capacity
         self.bts_list = []
+        self.lac = lac # location area code
+        self.ms_db = {}
+        
 
     def add_bts(self):
         if len(self.bts_list) == self.capacity:
@@ -48,7 +51,10 @@ class BSC:
         """
         Pass the connection request to MSC
         """
-        return self.msc.authenticate(self, bts, phone)
+        if self.msc.authenticate(self, bts, phone):
+            self.ms_db[phone.tmsi] = bts
+            return True
+        return False
     
     def auth_challenge(self, bts, phone, RAND):
         return bts.auth_challenge(phone, RAND)

@@ -12,13 +12,13 @@ network.add_bts()
 phone_list = [] 
 phone_list.append(network.create_new_ms())
 
-for bsc in network.msc.bsc_list:
+for bsc in network.msc.bsc_list.values():
     for bts in bsc.bts_list:
         if phone_list[-1].connect_to_bts(bts):
             break
 
 phone_list.append(network.create_new_ms())
-for bsc in network.msc.bsc_list:
+for bsc in network.msc.bsc_list.values():
     for bts in bsc.bts_list:
         if phone_list[-1].connect_to_bts(bts):
             break
@@ -27,13 +27,13 @@ network = Network("452", "02", "84", "98")
 network.add_bts()
         
 phone_list.append(network.create_new_ms())
-for bsc in network.msc.bsc_list:
+for bsc in network.msc.bsc_list.values():
     for bts in bsc.bts_list:
         if phone_list[-1].connect_to_bts(bts):
             break
         
 phone_list.append(network.create_new_ms())
-for bsc in network.msc.bsc_list:
+for bsc in network.msc.bsc_list.values():
     for bts in bsc.bts_list:
         if phone_list[-1].connect_to_bts(bts):
             break

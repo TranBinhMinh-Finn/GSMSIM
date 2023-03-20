@@ -8,7 +8,7 @@ class BTS:
         self.bsc = bsc
         self.capacity = capacity
         self.traffic_channels = traffic_channels
-        self.ms_list = []
+        self.ms_list = {}
         self.channels_in_use = 0
     
     def handle_connection_request(self, phone):
@@ -19,7 +19,7 @@ class BTS:
             return False
         
         if self.bsc.handle_connection_request(self, phone):
-            self.ms_list.append(phone)
+            self.ms_list[phone.tmsi] = phone
             return True
         return False
         
@@ -51,4 +51,4 @@ class BTS:
         self.bsc.send_sms(phone, number, message)
         
     def auth_challenge(self, phone, RAND):
-        return phone.cal_SRES(RAND)
+        return phone.authenticate(RAND)

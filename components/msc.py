@@ -1,6 +1,7 @@
 from components.hlr_auc import HLR
 from components.vlr import VLR, VLR_data, Call_data
 from .bsc import BSC
+import os,binascii
 from utils import network_db, network_code_mappings
 class MSC:
     def __init__(self, name="", hlr = None):
@@ -8,17 +9,21 @@ class MSC:
         self.hlr = hlr
         self.vlr = VLR()
         self.eir = {}
-        self.bsc_list = []
+        self.bsc_list = {}
 
     def add_bsc(self):
-        self.bsc_list.append(BSC(msc=self))
+        while True:
+            lac = binascii.b2a_hex(os.urandom(2)).decode("utf-8")
+            if lac not in self.bsc_list.keys() and lac!= 'ffff':
+                break  
+        self.bsc_list[lac] = BSC(msc=self, lac=lac)
+        return self.bsc_list[lac]
     
     def add_bts(self):
-        for bsc in self.bsc_list:
+        for bsc in self.bsc_list.values():
             if bsc.add_bts():
                 return
-        self.add_bsc()
-        self.bsc_list[-1].add_bts()
+        self.add_bsc().add_bts()
         
     def authenticate(self, bsc, bts, phone):
         """
@@ -27,9 +32,7 @@ class MSC:
         mcc = phone.imsi[:3]
         mnc = phone.imsi[3:5]
             
-        #print(RAND, Kc, SRES)
         if mcc != self.hlr.mcc or mnc != self.hlr.mnc:
-            #TODO: check hlr of other networks
             current_hlr = network_db[(mcc, mnc)]
             RAND, Kc, SRES = current_hlr.create_triplet(phone.number)
         else : 
@@ -40,6 +43,7 @@ class MSC:
         if SRES == bsc.auth_challenge(bts, phone, RAND): # phone authenticate sucessfully
             # assign tmsi
             phone.tmsi = self.vlr.generate_tmsi()
+            phone.lai = self.hlr.mcc + self.hlr.mnc + bsc.lac
             self.vlr.add_ms(phone.number, VLR_data(imsi=phone.imsi, tmsi=phone.tmsi, ms=phone))
             current_hlr.update_vlr(phone.number, self.vlr)
             return True

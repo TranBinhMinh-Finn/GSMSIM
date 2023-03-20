@@ -33,7 +33,7 @@ class Phone:
         print(f'Phone {self.number} failed to connect')
         return False
 
-    def cal_SRES(self, RAND):
+    def authenticate(self, RAND):
         """
         Calculate SRES for challenge
         """
