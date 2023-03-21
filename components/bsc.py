@@ -12,7 +12,6 @@ class BSC:
         self.lac = lac # location area code
         self.ms_route = {}
         
-
     def add_bts(self):
         if len(self.bts_list) == self.capacity:
             return None
@@ -22,14 +21,17 @@ class BSC:
     def make_call(self, calling_number, receiving_number):
         return self.msc.make_call(calling_number, receiving_number)
 
-    def call_connect(self, bts, phone, call_data):
-        bts.call_connect(phone, call_data)
+    def call_connect(self, tmsi, call_data):
+        bts = self.ms_route.get(tmsi)
+        bts.call_connect(tmsi, call_data)
     
-    def call_decline(self, bts, phone):
-        bts.call_decline(phone)
+    def call_decline(self, tmsi):
+        bts = self.ms_route.get(tmsi)
+        bts.call_decline(tmsi)
         
-    def call_alert(self, phone, bts, from_number):
-        return bts.call_alert(phone, from_number)
+    def call_alert(self, tmsi, from_number):
+        bts = self.ms_route.get(tmsi)
+        return bts.call_alert(tmsi, from_number)
     
     def call_confirm(self, first_number, second_number, confirm):
         self.msc.call_confirm(first_number, second_number, confirm)
@@ -37,8 +39,9 @@ class BSC:
     def request_end_call(self, first_number, second_number, in_call):
         return self.msc.request_end_call(first_number, second_number, in_call)
     
-    def end_call(self, bts, phone):
-        bts.end_call(phone)
+    def end_call(self, tmsi):
+        bts = self.ms_route.get(tmsi)
+        bts.end_call(tmsi)
     
     def send_sms(self, phone, number, message):
         recipient = self.msc.search_phone(number)

@@ -28,13 +28,16 @@ class BTS:
             return -1
         return self.bsc.make_call(calling_number, receiving_number)
         
-    def call_connect(self, phone, call_data):
+    def call_connect(self, tmsi, call_data):
+        phone = self.ms_list.get(tmsi)
         phone.call_connect(call_data)
     
-    def call_decline(self, phone):
+    def call_decline(self, tmsi):
+        phone = self.ms_list.get(tmsi)
         phone.call_decline()
     
-    def call_alert(self, phone, from_number):
+    def call_alert(self, tmsi, from_number):
+        phone = self.ms_list.get(tmsi)
         return phone.call_alert(from_number)
     
     def call_confirm(self, first_number, second_number, confirm): 
@@ -43,8 +46,9 @@ class BTS:
     def request_end_call(self, first_number, second_number, in_call):
         return self.bsc.request_end_call(first_number, second_number, in_call)
     
-    def end_call(self, phone):
+    def end_call(self, tmsi):
         self.channels_in_use -= 1
+        phone = self.ms_list.get(tmsi)
         phone.end_call()
     
     def send_sms(self, phone, number, message):
