@@ -7,7 +7,7 @@ class MSC:
     def __init__(self, name="", hlr = None):
         self.name = name
         self.hlr = hlr
-        self.vlr = VLR()
+        self.vlr = VLR(msc=self)
         self.eir = {}
         self.bsc_list = {}
 
@@ -44,12 +44,12 @@ class MSC:
             # assign tmsi
             phone.tmsi = self.vlr.generate_tmsi()
             phone.lai = self.hlr.mcc + self.hlr.mnc + bsc.lac
-            self.vlr.add_ms(phone.number, VLR_data(imsi=phone.imsi, tmsi=phone.tmsi, ms=phone))
+            self.vlr.add_ms(phone.number, VLR_data(imsi=phone.imsi, tmsi=phone.tmsi, ms=phone, lai=phone.lai))
             current_hlr.update_vlr(phone.number, self.vlr)
             return True
         return False
 
-    def find_vlr_data(self, number):
+    def find_serving_vlr(self, number):
         if len(number) >= 4:
             cc = number[:2]
             ndc = number[2:4]
@@ -64,54 +64,74 @@ class MSC:
                             return (vlr, phone)
         return (None, None) # Can't find phone in other hlr
 
-    def make_call(self, calling_number, receiving_number):
-        # get phone data of both numbers 
-        (receiving_vlr, receiving_phone) = self.find_vlr_data(receiving_number)
-        calling_phone = self.vlr.search_phone(calling_number)
-        if receiving_phone == None: # Can't find receive phone number
-            return 2
-        if receiving_phone.is_busy == False and calling_phone.is_busy == False:
-            self.vlr.change_status(calling_number)
-            receiving_vlr.change_status(receiving_number)
+    def get_serving_bsc(self, phone):
+        return self.bsc_list.get(phone.lai[-4:])
+        
+    def make_call(self, calling_number, receiving_number, flag=False):
+        """
+        Call setup
+        """
+        if not flag: # msc on the calling side
+            (receiving_vlr, receiving_phone) = self.find_serving_vlr(receiving_number)
+            calling_phone = self.vlr.search_phone(calling_number)
+            if receiving_phone == None: # Can't find receiving phone number
+                return 2
+            if receiving_phone.is_busy == False and calling_phone.is_busy == False:
+                self.vlr.change_status(calling_number)
+                # Call the msc of receiving side to setup the call
+                receiving_vlr.msc.make_call(calling_number, receiving_number, flag=True)
+                return 0 # Call successful
+            else:
+                return 1 # Receiver is busy
+        else: # msc on the receiving side
+            self.vlr.change_status(receiving_number)
+            receiving_phone = self.vlr.search_phone(receiving_number)
             receiving_phone.phone_calling = calling_number
-            receiving_phone.ms.bts.bsc.call_alert(receiving_phone.ms, receiving_phone.ms.bts , calling_number)
-            return 0
-            #Call successful
+            bsc = self.bsc_list.get(receiving_phone.lai[-4:])
+            if bsc is not None:
+                return bsc.call_alert(receiving_phone.ms, receiving_phone.ms.bts , calling_number)
+            return 1
+        
+    
+    def call_confirm(self, receiving_number, calling_number, confirm, flag=False):
+        if not flag:
+            receiving_phone = self.vlr.search_phone(receiving_number)
+            calling_vlr, calling_phone = self.find_serving_vlr(calling_number)
+            bsc = self.bsc_list.get(receiving_phone.lai[-4:])
+            if confirm == True:
+                self.vlr.update_call_data(receiving_number, calling_number)
+                bsc.call_connect(receiving_phone.ms.bts, receiving_phone.ms, receiving_phone.call_data)
+            else:
+                self.vlr.change_status(receiving_number) 
+                calling_vlr.msc.call_confirm(receiving_number, calling_number, flag=True)
         else:
-            return 1 # Receiver is busy
+            bsc = self.bsc_list.get(calling_number.lai[-4:])
+            calling_phone = self.vlr.search_phone(calling_number)
+            if confirm == True:
+                self.vlr.update_call_data(calling_number, receiving_number)
+                bsc.call_connect(calling_phone.ms.bts, calling_phone.ms, calling_phone.call_data)
+            else: 
+                bsc.call_decline(calling_phone.ms.bts, calling_phone.ms)
+                self.vlr.change_status(calling_number) 
+            
     
-    def call_confirm(self, first_number, second_number, confirm):
-        first_vlr, first_phone = self.find_vlr_data(first_number)
-        second_vlr, second_phone = self.find_vlr_data(second_number)
-        if confirm == True:
-            first_vlr.update_call_data(first_number, second_number, first_vlr, second_vlr)
-            second_vlr.update_call_data(second_number, first_number, second_vlr, first_vlr)
-            second_phone.ms.bts.bsc.call_connect(second_phone.ms.bts, second_phone.ms, second_phone.call_data)
-            first_phone.ms.bts.bsc.call_connect(first_phone.ms.bts, first_phone.ms, first_phone.call_data)
-        else: 
-            second_phone.ms.bts.bsc.call_decline(second_phone.ms.bts, second_phone.ms)
-            first_vlr.change_status(first_number)
-            second_vlr.change_status(second_number)
-    
-    def request_end_call(self, first_number, second_number, in_call):
-        first_ms = self.vlr.search_phone(first_number)
-        if first_ms.is_busy == False:
-            return False
-        second_vlr, second_ms = self.find_vlr_data(second_number)
-        if in_call == False:
+    def request_end_call(self, first_number, second_number, in_call, flag=False):
+        if not flag:
+            first_ms = self.vlr.search_phone(first_number)
+            if first_ms.is_busy == False:
+                return False
             self.vlr.change_status(first_number)
-            second_vlr.change_status(second_number)
-            second_ms.phone_calling = None
+            second_vlr, second_ms = self.find_serving_vlr(second_number)
+            bsc = self.get_serving_bsc(first_ms)
+            bsc.end_call(first_ms.ms.bts, first_ms.ms)
+            return second_vlr.msc.request_end_call(first_number, second_number, in_call, flag=True)
+        else:
+            second_ms = self.vlr.search_phone(second_number)
+            if second_ms.is_busy == False:
+                return False
+            self.vlr.change_status(second_number)
+            bsc = self.get_serving_bsc(second_ms)
+            bsc.end_call(second_ms.ms.bts, second_ms.ms)
             return True
-        second_ms = second_vlr.search_phone(second_number)
-        if second_ms == None: # Can't find phone in current vlr
-            self.vlr.change_status(first_number)
-        if second_ms.is_busy == False:
-            return False
-        self.vlr.change_status(first_number)
-        second_vlr.change_status(second_number)
-        first_ms.ms.bts.bsc.end_call(first_ms.ms.bts, first_ms.ms, first_ms.call_data)
-        second_ms.ms.bts.bsc.end_call(second_ms.ms.bts, second_ms.ms, second_ms.call_data)
-        return True
         
     

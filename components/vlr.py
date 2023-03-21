@@ -5,22 +5,21 @@ from datetime import datetime
 TMSI_GEN_RANGE = 2 ** 32 - 2
 
 class Call_data:
-    def __init__(self, first_number, second_number, start_time, first_vlr, second_vlr):
+    def __init__(self, first_number, second_number, start_time):
         self.first_number = first_number
-        self.first_vlr = first_vlr
         self.second_number = second_number
-        self.second_vlr = second_vlr
         self.start_time = start_time
     
 
 class VLR_data:
-    def __init__(self, imsi, tmsi, ms):
+    def __init__(self, imsi, tmsi, ms, lai):
         self.imsi = imsi
         self.tmsi = tmsi
         self.ms = ms
         self.is_busy = False
         self.phone_calling = None
         self.call_data = None
+        self.lai = lai
     imsi: int
     tmsi: int
     is_busy: bool
@@ -29,7 +28,8 @@ class VLR_data:
     ms: Phone
     
 class VLR:
-    def __init__(self):
+    def __init__(self, msc):
+        self.msc = msc
         self.ms_db = {}
         self.assigned_tmsi=[]
         
@@ -39,9 +39,9 @@ class VLR:
     def change_status(self, phone_number):
         self.ms_db[phone_number].is_busy = 1 - self.ms_db[phone_number].is_busy
 
-    def update_call_data(self, first_number, second_number, first_vlr, second_vlr):
+    def update_call_data(self, first_number, second_number):
         current_time = datetime.now()
-        self.ms_db[first_number].call_data = Call_data(first_number, second_number, current_time, first_vlr, second_vlr)
+        self.ms_db[first_number].call_data = Call_data(first_number, second_number, current_time)
     
     def generate_tmsi(self):
         tmsi = randint(0, TMSI_GEN_RANGE)

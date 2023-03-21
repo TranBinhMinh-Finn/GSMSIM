@@ -10,7 +10,7 @@ class BSC:
         self.capacity = capacity
         self.bts_list = []
         self.lac = lac # location area code
-        self.ms_db = {}
+        self.ms_route = {}
         
 
     def add_bts(self):
@@ -52,7 +52,7 @@ class BSC:
         Pass the connection request to MSC
         """
         if self.msc.authenticate(self, bts, phone):
-            self.ms_db[phone.tmsi] = bts
+            self.ms_route[phone.tmsi] = bts
             return True
         return False
     
