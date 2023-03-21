@@ -1,5 +1,5 @@
 DEFAULT_CAPACITY = 100
-DEFAULT_CHANNELS = 14
+DEFAULT_CHANNELS = 1
 
 class BTS:
     def __init__(self, bsc, name = "bts", capacity = DEFAULT_CAPACITY, traffic_channels = DEFAULT_CHANNELS):
@@ -26,21 +26,28 @@ class BTS:
     def make_call(self, calling_number, receiving_number):
         if self.channels_in_use == self.traffic_channels:
             return -1
-        return self.bsc.make_call(calling_number, receiving_number)
+        result = self.bsc.make_call(calling_number, receiving_number)
+        if result == 0: # setup successful, assign a channel
+            self.channels_in_use += 1
+        return result
         
     def call_connect(self, tmsi, call_data):
         phone = self.ms_list.get(tmsi)
         phone.call_connect(call_data)
     
     def call_decline(self, tmsi):
+        self.channels_in_use -= 1
         phone = self.ms_list.get(tmsi)
         phone.call_decline()
     
     def call_alert(self, tmsi, from_number):
+        self.channels_in_use += 1
         phone = self.ms_list.get(tmsi)
         return phone.call_alert(from_number)
     
     def call_confirm(self, first_number, second_number, confirm): 
+        if not confirm:
+            self.channels_in_use -= 1
         return self.bsc.call_confirm(first_number, second_number, confirm)
         
     def request_end_call(self, first_number, second_number, in_call):
