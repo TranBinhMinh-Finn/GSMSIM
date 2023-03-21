@@ -12,13 +12,13 @@ network.add_bts()
 phone_list = [] 
 phone_list.append(network.create_new_ms())
 
-for bsc in network.msc.bsc_list:
+for bsc in network.msc.bsc_list.values():
     for bts in bsc.bts_list:
         if phone_list[-1].connect_to_bts(bts):
             break
 
 phone_list.append(network.create_new_ms())
-for bsc in network.msc.bsc_list:
+for bsc in network.msc.bsc_list.values():
     for bts in bsc.bts_list:
         if phone_list[-1].connect_to_bts(bts):
             break
@@ -27,13 +27,13 @@ network = Network("452", "02", "84", "98")
 network.add_bts()
         
 phone_list.append(network.create_new_ms())
-for bsc in network.msc.bsc_list:
+for bsc in network.msc.bsc_list.values():
     for bts in bsc.bts_list:
         if phone_list[-1].connect_to_bts(bts):
             break
         
 phone_list.append(network.create_new_ms())
-for bsc in network.msc.bsc_list:
+for bsc in network.msc.bsc_list.values():
     for bts in bsc.bts_list:
         if phone_list[-1].connect_to_bts(bts):
             break
@@ -48,6 +48,67 @@ phone_list[0].request_end_call()
 phone_list[2].request_end_call()
 """
 
+def ms_interface():
+    print(f"Input phone number of MS, or enter 0 to return: ")
+    phone_number = ""
+    while phone_number != "0":
+        phone_number = input()
+        if(phone_number == "0"):
+            break
+        cc = phone_number[0:2]
+        ndc = phone_number[2:4]
+        if len(phone_number) < 4:
+            print(f"Wrong phone number. Type again.")
+            continue
+        network_code = network_code_mappings.get((cc, ndc))
+        if network_code == None:
+            print(f"Wrong phone number. Type again.")
+            continue
+        else:
+            hlr = network_db.get(network_code)
+            if hlr == None: # Can't find hlr 
+                print(f"Wrong phone number. Type again.")
+                continue
+            if hlr.search_phone(phone_number) != None:
+                current_vlr = hlr.ms_db[phone_number].serving_vlr
+                phone = current_vlr.search_phone(phone_number).ms
+                break
+            else: # Can't find phone in hlr
+                print(f"Wrong phone number. Type again.")
+                continue
+    # check receive call
+    #print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: connect network")
+    while True:
+        phone.check_state()
+        print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: connect network)")
+        action = input()
+        if action == "0":
+            return
+        if action == "1":
+            print(f"Type number you want to call: ")
+            receive_number = input()
+            phone.make_call(receive_number)
+            continue
+        if action == "2":
+            phone.request_end_call()
+            continue
+        if action == "3":
+            phone.connect_to_bts(phone.search_for_bts())
+            continue
+        print(f"Type again.")
+    
+def bts_interface():
+    print(f"Input number of BTS, or enter 0 to return: ")
+    
+def bsc_interface():
+    print(f"Input number of BSC, or enter 0 to return: ")
+        
+def msc_interface():
+    print(f"Input number of MSC, or enter 0 to return: ")
+
+def network_interface():
+    print(f"Input number of network, or enter 0 to return: ")
+
 while True:
     print(f"Access to :(1: network / 2: msc / 3: bsc / 4: bts / 5: ms)")
     s = input()
@@ -55,53 +116,7 @@ while True:
         print(f"Type again: (1: network / 2: msc / 3: bsc / 4: bts / 5: ms)")
         s = input()
     if s == "5":
-        phone_number = "-1"
-        while phone_number != "0":
-            print(f"Phone number: ")
-            phone_number = input()
-            if(phone_number == "0"):
-                break
-            cc = phone_number[0:2]
-            ndc = phone_number[2:4]
-            if len(phone_number) < 4:
-                print(f"Wrong phone number. Type again.")
-                continue
-            network_code = network_code_mappings.get((cc, ndc))
-            if network_code == None:
-                print(f"Wrong phone number. Type again.")
-                continue
-            else:
-                hlr = network_db.get(network_code)
-                if hlr == None: # Can't find hlr 
-                    print(f"Wrong phone number. Type again.")
-                    continue
-                if hlr.search_phone(phone_number) != None:
-                    current_vlr = hlr.ms_db[phone_number].serving_vlr
-                    phone = current_vlr.search_phone(phone_number).ms
-                else: # Can't find phone in hlr
-                    print(f"Wrong phone number. Type again.")
-                    continue
-            # check receive call
-            phone.call_alert()
-            if(phone.from_number != None): 
-                phone.call_confirm()
-            #print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: connect network")
-            while True:
-                print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: connect network)")
-                action = input()
-                if action == "0":
-                    break
-                if action == "1":
-                    print(f"Type number you want to call: ")
-                    receive_number = input()
-                    phone.make_call(receive_number)
-                    continue
-                if action == "2":
-                    phone.request_end_call()
-                    continue
-                if action == "3":
-                    phone.connect_to_bts(phone.search_for_bts())
-                    continue
-                print(f"Type again.")
+        ms_interface()
+        
             
              

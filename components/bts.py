@@ -1,13 +1,14 @@
 DEFAULT_CAPACITY = 100
-DEFAULT_CHANNELS = 14
+DEFAULT_CHANNELS = 1
 
 class BTS:
     def __init__(self, bsc, name = "bts", capacity = DEFAULT_CAPACITY, traffic_channels = DEFAULT_CHANNELS):
         self.name = name
+        self.id = id
         self.bsc = bsc
         self.capacity = capacity
         self.traffic_channels = traffic_channels
-        self.ms_list = []
+        self.ms_list = {}
         self.channels_in_use = 0
     
     def handle_connection_request(self, phone):
@@ -17,31 +18,48 @@ class BTS:
         if len(self.ms_list) >= self.capacity:
             return False
         
-        if self.bsc.handle_connection_request(phone):
-            self.ms_list.append(phone)
+        if self.bsc.handle_connection_request(self, phone):
+            self.ms_list[phone.tmsi] = phone
             return True
         return False
         
     def make_call(self, calling_number, receiving_number):
         if self.channels_in_use == self.traffic_channels:
             return -1
-        return self.bsc.make_call(calling_number, receiving_number)
+        result = self.bsc.make_call(calling_number, receiving_number)
+        if result == 0: # setup successful, assign a channel
+            self.channels_in_use += 1
+        return result
         
-    def call_connect(self, phone, call_data):
+    def call_connect(self, tmsi, call_data):
+        phone = self.ms_list.get(tmsi)
         phone.call_connect(call_data)
     
-    def call_alert(self, phone_number):
-        return self.bsc.call_alert(phone_number)
+    def call_decline(self, tmsi):
+        self.channels_in_use -= 1
+        phone = self.ms_list.get(tmsi)
+        phone.call_decline()
+    
+    def call_alert(self, tmsi, from_number):
+        self.channels_in_use += 1
+        phone = self.ms_list.get(tmsi)
+        return phone.call_alert(from_number)
     
     def call_confirm(self, first_number, second_number, confirm): 
+        if not confirm:
+            self.channels_in_use -= 1
         return self.bsc.call_confirm(first_number, second_number, confirm)
         
-    def request_end_call(self, phone_number):
-        return self.bsc.request_end_call(phone_number)
+    def request_end_call(self, first_number, second_number, in_call):
+        return self.bsc.request_end_call(first_number, second_number, in_call)
     
-    def end_call(self, phone, call_data):
+    def end_call(self, tmsi):
         self.channels_in_use -= 1
-        phone.end_call(call_data)
+        phone = self.ms_list.get(tmsi)
+        phone.end_call()
     
     def send_sms(self, phone, number, message):
         self.bsc.send_sms(phone, number, message)
+        
+    def auth_challenge(self, phone, RAND):
+        return phone.authenticate(RAND)

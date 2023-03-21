@@ -11,7 +11,14 @@ class Phone:
         self.lai = None
         self.imsi = imsi
         self.tmsi = None
+        self.in_call = False
         self.from_number = None
+        self.to_number = None
+        self.wait_confirm = False
+        self.decline = False
+        self.call_data = None
+        self.end_time = None
+        self.wait_call = False
 
     def search_for_bts(self):
         bts = None
@@ -26,7 +33,7 @@ class Phone:
         print(f'Phone {self.number} failed to connect')
         return False
 
-    def cal_SRES(self, RAND):
+    def authenticate(self, RAND):
         """
         Calculate SRES for challenge
         """
@@ -45,16 +52,41 @@ class Phone:
             print(f"Receiver doesn't exist")
         if result == -1:
             print(f"Line busy")
+        if result == 0:
+            #print(f"Calling {receiving_number}...")
+            self.wait_confirm = True
+            self.to_number = receiving_number
     
     def call_connect(self, call_data):
+        self.call_data = call_data
         number_call = call_data.second_number
-        print(f"{self.number}: Call started with number: {number_call}.")
+        self.in_call = True
+        self.to_number = number_call
+        self.wait_confirm = False
+        self.wait_call = False
+        #print(f"{self.number}: Call started with number: {number_call}.")
     
-    def call_alert(self):
-        from_number = self.bts.call_alert(self.number)
-        if from_number != None: 
-            print(f"Receiving call from {from_number}")
+    def call_decline(self):
+        self.decline = True
+        self.wait_confirm = False
+    
+    def call_alert(self, from_number):
         self.from_number = from_number
+    
+    def check_state(self):
+        if self.from_number != None: 
+            print(f"Receiving call from {self.from_number}")
+            self.call_confirm()
+        if self.in_call == True and self.wait_confirm == False:
+            print(f"In a call with {self.to_number}.")
+        if self.in_call == False and self.wait_confirm == True:
+            print(f"Calling {self.to_number}...")    
+        if self.decline == True:
+            print(f"Receiver {self.to_number} declined your call.")
+            self.decline = False
+        if self.end_time != None:
+            print(f"Call end with {self.call_data.second_number} in {self.end_time - self.call_data.start_time}.")
+            self.end_time = None
     
     def call_confirm(self):
         print(f"Press Y to accept, N to decline: Y/N?")
@@ -69,16 +101,18 @@ class Phone:
         self.from_number = None
     
     def request_end_call(self):
-        result = self.bts.request_end_call(self.number)
+        result = self.bts.request_end_call(self.number, self.to_number, self.in_call)
+        self.wait_confirm = False
         if result == True:
             print(f"End successful.")
         else:
             print(f"Fail to end call.")
     
-    def end_call(self, call_data):
-        number_call = call_data.second_number
-        end_time = datetime.now()
-        print(f"{self.number}: Call with number {number_call} ended in {end_time - call_data.start_time}")
+    def end_call(self):
+        #number_call = call_data.second_number
+        self.in_call = False
+        self.end_time = datetime.now()
+        #print(f"{self.number}: Call with number {number_call} ended in {end_time - call_data.start_time}")
     
     def text(self, number, message):
         if not self.bts:
