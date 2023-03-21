@@ -135,9 +135,8 @@ class MSC:
             if second_ms.is_busy == False:
                 return False
             self.vlr.change_status(second_number)
-            if in_call:
-                bsc = self.get_serving_bsc(second_ms)
-                bsc.end_call(second_ms.tmsi)
+            bsc = self.get_serving_bsc(second_ms)
+            bsc.end_call(second_ms.tmsi)
             return True
         
     

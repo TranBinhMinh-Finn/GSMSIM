@@ -108,8 +108,11 @@ class Phone:
             print(f"Fail to end call.")
     
     def end_call(self):
-        self.in_call = False
-        self.end_time = datetime.now()
+        if not self.in_call:
+            self.from_number = None
+        else:
+            self.in_call = False
+            self.end_time = datetime.now()
     
     def text(self, number, message):
         if not self.bts:
