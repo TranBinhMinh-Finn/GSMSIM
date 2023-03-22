@@ -2,7 +2,7 @@ import os,binascii
 from .msc import MSC
 from .hlr_auc import HLR, HLR_data
 from .phone import Phone
-from utils import network_db, network_code_mappings
+from utils import networks, network_code_mappings
 
 class Network:
    
@@ -11,14 +11,17 @@ class Network:
         self.mnc = mnc # mobile network code
         self.cc = cc # country code
         self.ndc = ndc # national destination code
-        self.hlr = HLR(mcc, mnc, cc, ndc)
+        self.hlr = HLR(self, mcc, mnc, cc, ndc)
         self.msc = MSC(hlr=self.hlr)
         self.ms_count = 0
-        network_db[(mcc, mnc)] = self.hlr
+        networks[(mcc, mnc)] = self
         network_code_mappings[(cc, ndc)] = (mcc, mnc)
         
     def add_bts(self):
         return self.msc.add_bts()
+    
+    def get_available_bts(self):
+        return self.msc.get_available_bts()
         
     def create_new_ms(self):
         self.ms_count+=1

@@ -1,4 +1,3 @@
-
-network_db = {}
+networks = {}
 
 network_code_mappings ={}

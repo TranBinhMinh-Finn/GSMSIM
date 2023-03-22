@@ -20,9 +20,8 @@ class Phone:
         self.end_time = None
         self.wait_call = False
 
-    def search_for_bts(self):
-        bts = None
-        # find an available bts from a list of bts
+    def search_for_bts(self, network):
+        bts = network.get_available_bts()
         return bts
     
     def connect_to_bts(self, bts):
@@ -33,6 +32,9 @@ class Phone:
         print(f'Phone {self.number} failed to connect')
         return False
 
+    def connect_to_network(self, network):
+        self.connect_to_bts(self.search_for_bts(network))
+    
     def authenticate(self, RAND):
         """
         Calculate SRES for challenge

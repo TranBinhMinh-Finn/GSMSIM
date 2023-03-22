@@ -2,7 +2,7 @@ from components.hlr_auc import HLR
 from components.vlr import VLR, VLR_data, Call_data
 from .bsc import BSC
 import os,binascii
-from utils import network_db, network_code_mappings
+from utils import networks, network_code_mappings
 class MSC:
     def __init__(self, hlr):
         self.hlr = hlr
@@ -23,7 +23,13 @@ class MSC:
             if bsc.add_bts():
                 return
         self.add_bsc().add_bts()
-        
+    
+    def get_available_bts(self):
+        for bsc in self.bsc_list.values():
+            for bts in bsc.bts_list:
+                if len(bts.ms_list.values()) < bts.capacity:
+                    return bts
+    
     def authenticate(self, bsc, bts, phone):
         """
         Authenticate the requesting MS and update the vlr if successful
@@ -32,7 +38,9 @@ class MSC:
         mnc = phone.imsi[3:5]
             
         if mcc != self.hlr.mcc or mnc != self.hlr.mnc:
-            current_hlr = network_db[(mcc, mnc)]
+            network = networks[(mcc, mnc)]
+            if network is not None:
+                current_hlr = network.hlr
             RAND, Kc, SRES = current_hlr.create_triplet(phone.number)
         else : 
             # phone in current hlr
@@ -54,8 +62,9 @@ class MSC:
             ndc = number[2:4]
             network_code =  network_code_mappings.get((cc, ndc))
             if network_code != None:
-                hlr = network_db.get(network_code)
-                if hlr != None:
+                network = networks.get(network_code)
+                if network is not None:
+                    hlr = network.hlr
                     if hlr.search_phone(number) != None:
                         vlr = hlr.ms_db[number].serving_vlr
                         phone = vlr.search_phone(number)

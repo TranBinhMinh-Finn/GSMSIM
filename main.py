@@ -5,7 +5,7 @@ from components.phone import Phone
 from components.hlr_auc import HLR, HLR_data
 from components.network import Network
 import time
-from utils import network_db, network_code_mappings
+from utils import networks, network_code_mappings
 
 network_list = {}
 network = Network("452", "01", "84", "91")
@@ -13,33 +13,20 @@ network_list[(network.mcc, network.mnc)] = network
 network.add_bts()
 phone_list = [] 
 phone_list.append(network.create_new_ms())
-
-for bsc in network.msc.bsc_list.values():
-    for bts in bsc.bts_list:
-        if phone_list[-1].connect_to_bts(bts):
-            break
+phone_list[-1].connect_to_network(network)
 
 phone_list.append(network.create_new_ms())
-for bsc in network.msc.bsc_list.values():
-    for bts in bsc.bts_list:
-        if phone_list[-1].connect_to_bts(bts):
-            break
+phone_list[-1].connect_to_network(network)
 
 network = Network("452", "02", "84", "98")
 network_list[(network.mcc, network.mnc)] = network
 network.add_bts()
         
 phone_list.append(network.create_new_ms())
-for bsc in network.msc.bsc_list.values():
-    for bts in bsc.bts_list:
-        if phone_list[-1].connect_to_bts(bts):
-            break
+phone_list[-1].connect_to_network(network)
         
 phone_list.append(network.create_new_ms())
-for bsc in network.msc.bsc_list.values():
-    for bts in bsc.bts_list:
-        if phone_list[-1].connect_to_bts(bts):
-            break
+phone_list[-1].connect_to_network(network)
 """    
 phone_list[0].make_call("66330000000003")
 time.sleep(5)
@@ -68,10 +55,11 @@ def ms_interface():
             print(f"Wrong phone number. Type again.")
             continue
         else:
-            hlr = network_db.get(network_code)
-            if hlr == None: # Can't find hlr 
+            network = networks.get(network_code)
+            if network is None: # Can't find hlr 
                 print(f"Wrong phone number. Type again.")
                 continue
+            hlr = network.hlr
             if hlr.search_phone(phone_number) != None:
                 current_vlr = hlr.ms_db[phone_number].serving_vlr
                 phone = current_vlr.search_phone(phone_number).ms
