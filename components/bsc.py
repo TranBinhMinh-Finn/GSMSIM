@@ -42,12 +42,12 @@ class BSC:
         bts = self.ms_route.get(tmsi)
         bts.end_call(tmsi)
     
-    def send_sms(self, sending_number, receiving_number, message):
-        self.msc.send_sms(sending_number, receiving_number, message)
+    def send_sms(self, sending_number, receiving_number, send_time, message):
+        return self.msc.send_sms(sending_number, receiving_number, send_time, message)
         
-    def receive_sms(self, sending_number, receiving_tmsi, message):
+    def receive_sms(self, sending_number, receiving_tmsi, send_time, message):
         bts = self.ms_route.get(receiving_tmsi)    
-        bts.receive_sms(sending_number, message, receiving_tmsi)       
+        bts.receive_sms(sending_number, message, send_time, receiving_tmsi)       
 
     def handle_connection_request(self, bts, phone):
         """
