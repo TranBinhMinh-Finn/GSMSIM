@@ -158,7 +158,7 @@ class MSC:
             return receiving_vlr.msc.send_sms(sending_number, receiving_number, send_time, message)
         else:
             bsc = self.get_serving_bsc(receiving_phone)
-            bsc.receive_sms(sending_number=sending_number, receiving_tmsi=receiving_phone.tmsi, message=message)
+            bsc.receive_sms(sending_number=sending_number, receiving_tmsi=receiving_phone.tmsi, send_time=send_time, message=message)
             return 0
         
     def disconnect_ms(self, phone):
