@@ -146,10 +146,13 @@ def network_interface():
                         continue
                     if action == "2":
                         print(f"Type the number of bts you want to add: ")
-                        number_bts = input()
-                        while number_bts > 0:
-                            current_network.add_bts()
-                            number_bts -= 1
+                        try:
+                            number_bts = int(input())
+                            while number_bts > 0:
+                                current_network.add_bts()
+                                number_bts -= 1
+                        except:
+                            print("Not a number.")
                     if action == "3":
                         current_network.show_all_ms()
                     if action == "4":

@@ -66,10 +66,6 @@ class Phone:
     
     @check_connection 
     def make_call(self, receiving_number):
-        # if self.bts is None:
-        #     print(f"(MS {self.number}): Not connected to any network.")
-        #     return
-        
         result = self.bts.make_call(self.number, receiving_number)
         if result == 1:
             print(f"(MS {self.number}): Receiver is busy.")
