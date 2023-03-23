@@ -42,13 +42,13 @@ class BSC:
         bts = self.ms_route.get(tmsi)
         bts.end_call(tmsi)
     
-    def send_sms(self, phone, number, message):
-        recipient = self.msc.search_phone(number)
-        if recipient:
-            print(f"SMS from {phone.name} to {recipient.name} ({recipient.number}): {message}")
-        else:
-            print(f"Phone number {number} not found.")
-            
+    def send_sms(self, sending_number, receiving_number, message):
+        self.msc.send_sms(sending_number, receiving_number, message)
+        
+    def receive_sms(self, sending_number, receiving_tmsi, message):
+        bts = self.ms_route.get(receiving_tmsi)    
+        bts.receive_sms(sending_number, message, receiving_tmsi)       
+
     def handle_connection_request(self, bts, phone):
         """
         Pass the connection request to MSC
