@@ -25,14 +25,23 @@ class Phone:
         return bts
     
     def connect_to_bts(self, bts):
-        if bts.handle_connection_request(self):
-            print(f'(MS {self.number}: Connected successfully.)')
-            self.bts = bts
-            return True
+        if bts is not None:
+            if bts.handle_connection_request(self):
+                print(f'(MS {self.number}: Connected successfully.)')
+                self.bts = bts
+                return True
         print(f'(MS {self.number}: Failed to connect.)')
         return False
 
+    def disconnect_from_bts(self):
+        if self.bts is None:
+            return
+        self.bts.disconnect_ms(self)
+        self.bts = None
+        
     def connect_to_network(self, network):
+        if self.bts is not None:
+            self.disconnect_from_bts()
         self.connect_to_bts(self.search_for_bts(network))
     
     def authenticate(self, RAND):

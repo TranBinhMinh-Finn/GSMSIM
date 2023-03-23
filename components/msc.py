@@ -157,4 +157,14 @@ class MSC:
         else:
             bsc = self.get_serving_bsc(receiving_phone)
             bsc.receive_sms(sending_number=sending_number, receiving_tmsi=receiving_phone.tmsi, message=message)
+            
+    def disconnect_ms(self, phone):
+        cc = phone.number[:2]
+        ndc = phone.number[2:4]
+        network_code = network_code_mappings.get((cc, ndc))
+        network = networks.get(network_code)
+        hlr = network.hlr
+        hlr.update_vlr(phone.number, None)
+        self.vlr.remove_ms(phone.number)
+        
     

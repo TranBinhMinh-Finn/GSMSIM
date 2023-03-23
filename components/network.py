@@ -36,10 +36,7 @@ class Network:
         Ki = binascii.b2a_hex(os.urandom(16)).decode("utf-8")
         self.ms_list[phone_number] = Phone(number=phone_number, imsi=imsi, ki=Ki)
         self.hlr.add_ms(phone_number=phone_number, data=HLR_data(imsi=imsi, Ki=Ki))
-        return Phone(
-                    number=phone_number,
-                    imsi=imsi,
-                    ki=Ki)
+        return self.ms_list[phone_number]
     
     def show_number_bts_bsc(self):
         print(f"There are {self.bts_count} bts in this network")

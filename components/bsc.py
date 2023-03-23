@@ -60,3 +60,7 @@ class BSC:
     
     def auth_challenge(self, bts, phone, RAND):
         return bts.auth_challenge(phone, RAND)
+    
+    def disconnect_ms(self, phone):
+        self.ms_route.pop(phone.tmsi)
+        self.msc.disconnect_ms(phone)
