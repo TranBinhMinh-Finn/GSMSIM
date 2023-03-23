@@ -82,7 +82,12 @@ def ms_interface():
             print(f"Mobile network code (mnc):")
             mnc = input()
             current_network = network_list.get((mcc, mnc))
-            phone.connect_to_bts(phone.search_for_bts(current_network))
+            bts = phone.search_for_bts(current_network)
+            if bts == None:
+                print(f"Can't connect to this network.")
+            else:
+                print(f"Connect successfully")
+                phone.connect_to_bts()
             continue
         if action == "4":
             phone.show_info()
