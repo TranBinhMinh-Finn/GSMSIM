@@ -30,6 +30,7 @@ class MSC:
             for bts in bsc.bts_list:
                 if len(bts.ms_list.values()) < bts.capacity:
                     return bts
+        return None
     
     def authenticate(self, bsc, bts, phone):
         """
