@@ -59,8 +59,12 @@ class BTS:
         phone = self.ms_list.get(tmsi)
         phone.end_call()
     
-    def send_sms(self, phone, number, message):
-        self.bsc.send_sms(phone, number, message)
+    def send_sms(self, sending_number, receiving_number, message):
+        self.bsc.send_sms(sending_number, receiving_number, message)
+        
+    def receive_sms(self, sending_number, message, tmsi):
+        phone = self.ms_list.get(tmsi)
+        phone.receive_sms(sending_number, message)
         
     def auth_challenge(self, phone, RAND):
         return phone.authenticate(RAND)

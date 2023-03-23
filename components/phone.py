@@ -127,9 +127,8 @@ class Phone:
         print(f"IMSI: {self.imsi}")
         print(f"Ki: {self.ki}")
     
-    def text(self, number, message):
-        if not self.bts:
-            if not self.connect_to_bts():
-                print(f"Failed to connect to network for {self.name}")
-                return
-            self.bts.send_sms(self, number, message)
+    def text(self, receiving_number, message):
+        self.bts.send_sms(self.number, receiving_number, message)
+        
+    def receive_sms(self, sending_number, message):
+        print(f'{sending_number}:{message}')
