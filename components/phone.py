@@ -54,11 +54,22 @@ class Phone:
         Kc, SRES = auth(self.ki, RAND)
         return SRES
 
-    def make_call(self, receiving_number):
-        if not self.bts:
-            if not self.connect_to_bts(self.search_for_bts()):
-                print(f"(MS {self.number}): Failed to connect to network.")
+    def check_connection(func):
+        def wrapper(*args, **kwargs):
+            ms=args[0]
+            if ms.bts is None:
+                print(f"(MS {ms.number}): Not connected to any network.")
                 return
+            func(*args, **kwargs)
+        
+        return wrapper
+    
+    @check_connection 
+    def make_call(self, receiving_number):
+        # if self.bts is None:
+        #     print(f"(MS {self.number}): Not connected to any network.")
+        #     return
+        
         result = self.bts.make_call(self.number, receiving_number)
         if result == 1:
             print(f"(MS {self.number}): Receiver is busy.")
@@ -125,6 +136,7 @@ class Phone:
             self.bts.call_confirm(self.number, self.from_number, False)
         self.from_number = None
     
+    @check_connection
     def request_end_call(self):
         result = self.bts.request_end_call(self.number, self.to_number, self.in_call)
         self.wait_confirm = False
@@ -192,6 +204,7 @@ class Phone:
                 print(f"(MS {self.number}): Type something to return.")
                 input()
     
+    @check_connection
     def text(self, receiving_number, message):
         send_time=datetime.now()
         result = self.bts.send_sms(self.number, receiving_number, send_time, message)
