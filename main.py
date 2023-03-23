@@ -29,16 +29,6 @@ phone_list[-1].connect_to_network(network)
         
 phone_list.append(network.create_new_ms())
 phone_list[-1].connect_to_network(network)
-"""    
-phone_list[0].make_call("66330000000003")
-time.sleep(5)
-phone_list[1].request_end_call()
-phone_list[0].make_call(phone_list[2].number)
-phone_list[1].make_call(phone_list[2].number)
-time.sleep(5)
-phone_list[0].request_end_call()
-phone_list[2].request_end_call()
-"""
 
 def ms_interface():
     print(f"Input phone number of MS, or enter 0 to return: ")

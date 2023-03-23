@@ -149,7 +149,7 @@ class MSC:
             bsc.end_call(second_ms.tmsi)
             return True
         
-    def send_sms(self, sending_number, receiving_number ,message):
+    def send_sms(self, sending_number, receiving_number, message):
         (receiving_vlr, receiving_phone) = self.find_serving_vlr(receiving_number)
         if receiving_vlr != self.vlr: # receiver in different network
             receiving_vlr.msc.send_sms(sending_number, receiving_number, message)
