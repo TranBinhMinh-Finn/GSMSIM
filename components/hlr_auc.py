@@ -14,8 +14,9 @@ class HLR_data:
 
     
 class HLR:
-    def __init__(self, mcc, mnc, cc, ndc):
+    def __init__(self, network, mcc, mnc, cc, ndc):
         self.ms_db = {}
+        network = network
         self.mcc = mcc # mobile country code
         self.mnc = mnc # mobile network code
         self.cc = cc # country code

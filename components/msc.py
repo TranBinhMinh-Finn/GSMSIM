@@ -2,10 +2,9 @@ from components.hlr_auc import HLR
 from components.vlr import VLR, VLR_data, Call_data
 from .bsc import BSC
 import os,binascii
-from utils import network_db, network_code_mappings
+from utils import networks, network_code_mappings
 class MSC:
-    def __init__(self, name="", hlr = None):
-        self.name = name
+    def __init__(self, hlr):
         self.hlr = hlr
         self.vlr = VLR(msc=self)
         self.eir = {}
@@ -21,10 +20,17 @@ class MSC:
     
     def add_bts(self):
         for bsc in self.bsc_list.values():
-            if bsc.add_bts():
-                return
+            if bsc.add_bts(): 
+                return True # add bts into old bsc
         self.add_bsc().add_bts()
-        
+        return False # add bts into new bsc
+    
+    def get_available_bts(self):
+        for bsc in self.bsc_list.values():
+            for bts in bsc.bts_list:
+                if len(bts.ms_list.values()) < bts.capacity:
+                    return bts
+    
     def authenticate(self, bsc, bts, phone):
         """
         Authenticate the requesting MS and update the vlr if successful
@@ -33,7 +39,9 @@ class MSC:
         mnc = phone.imsi[3:5]
             
         if mcc != self.hlr.mcc or mnc != self.hlr.mnc:
-            current_hlr = network_db[(mcc, mnc)]
+            network = networks[(mcc, mnc)]
+            if network is not None:
+                current_hlr = network.hlr
             RAND, Kc, SRES = current_hlr.create_triplet(phone.number)
         else : 
             # phone in current hlr
@@ -55,8 +63,9 @@ class MSC:
             ndc = number[2:4]
             network_code =  network_code_mappings.get((cc, ndc))
             if network_code != None:
-                hlr = network_db.get(network_code)
-                if hlr != None:
+                network = networks.get(network_code)
+                if network is not None:
+                    hlr = network.hlr
                     if hlr.search_phone(number) != None:
                         vlr = hlr.ms_db[number].serving_vlr
                         phone = vlr.search_phone(number)
@@ -79,8 +88,8 @@ class MSC:
             if receiving_phone.is_busy == False and calling_phone.is_busy == False:
                 self.vlr.change_status(calling_number)
                 # Call the msc of receiving side to setup the call
-                receiving_vlr.msc.make_call(calling_number, receiving_number, flag=True)
-                return 0 # Call successful
+                return receiving_vlr.msc.make_call(calling_number, receiving_number, flag=True)
+                #return 0 # Call successful
             else:
                 return 1 # Receiver is busy
         else: # msc on the receiving side
@@ -136,9 +145,8 @@ class MSC:
             if second_ms.is_busy == False:
                 return False
             self.vlr.change_status(second_number)
-            if in_call:
-                bsc = self.get_serving_bsc(second_ms)
-                bsc.end_call(second_ms.tmsi)
+            bsc = self.get_serving_bsc(second_ms)
+            bsc.end_call(second_ms.tmsi)
             return True
         
     

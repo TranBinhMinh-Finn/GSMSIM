@@ -1,9 +1,8 @@
-DEFAULT_CAPACITY = 100
+DEFAULT_CAPACITY = 10
 DEFAULT_CHANNELS = 1
 
 class BTS:
-    def __init__(self, bsc, name = "bts", capacity = DEFAULT_CAPACITY, traffic_channels = DEFAULT_CHANNELS):
-        self.name = name
+    def __init__(self, bsc, id="", capacity = DEFAULT_CAPACITY, traffic_channels = DEFAULT_CHANNELS):
         self.id = id
         self.bsc = bsc
         self.capacity = capacity
@@ -41,6 +40,8 @@ class BTS:
         phone.call_decline()
     
     def call_alert(self, tmsi, from_number):
+        if self.channels_in_use == self.traffic_channels:
+            return -1
         self.channels_in_use += 1
         phone = self.ms_list.get(tmsi)
         return phone.call_alert(from_number)
