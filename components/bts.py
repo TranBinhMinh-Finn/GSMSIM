@@ -1,4 +1,4 @@
-DEFAULT_CAPACITY = 10
+DEFAULT_CAPACITY = 1
 DEFAULT_CHANNELS = 1
 
 class BTS:
@@ -68,3 +68,7 @@ class BTS:
         
     def auth_challenge(self, phone, RAND):
         return phone.authenticate(RAND)
+
+    def disconnect_ms(self, phone):
+        self.ms_list.pop(phone.tmsi)
+        self.bsc.disconnect_ms(phone)

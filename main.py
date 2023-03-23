@@ -23,6 +23,8 @@ phone_list[-1].connect_to_network(network)
 network = Network("452", "02", "84", "98")
 network_list[(network.mcc, network.mnc)] = network
 network.add_bts()
+network.add_bts()
+network.add_bts()
         
 phone_list.append(network.create_new_ms())
 phone_list[-1].connect_to_network(network)
@@ -48,15 +50,13 @@ def ms_interface():
             continue
         else:
             network = networks.get(network_code)
-            if network is None: # Can't find hlr 
+            if network is None: # Can't find network 
                 print(f"Wrong phone number. Type again.")
                 continue
-            hlr = network.hlr
-            if hlr.search_phone(phone_number) != None:
-                current_vlr = hlr.ms_db[phone_number].serving_vlr
-                phone = current_vlr.search_phone(phone_number).ms
+            phone = network.ms_list.get(phone_number)
+            if phone is not None:
                 break
-            else: # Can't find phone in hlr
+            else: # Can't find phone in network
                 print(f"Wrong phone number. Type again.")
                 continue
     # check receive call
@@ -82,12 +82,11 @@ def ms_interface():
             print(f"Mobile network code (mnc):")
             mnc = input()
             current_network = network_list.get((mcc, mnc))
-            bts = phone.search_for_bts(current_network)
-            if bts == None:
+            if current_network is None:
                 print(f"Can't connect to this network.")
             else:
                 print(f"Connect successfully")
-                phone.connect_to_bts()
+                phone.connect_to_network(current_network)
             continue
         if action == "4":
             phone.show_info()
