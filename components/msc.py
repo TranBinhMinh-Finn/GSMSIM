@@ -69,9 +69,10 @@ class MSC:
                     hlr = network.hlr
                     if hlr.search_phone(number) != None:
                         vlr = hlr.ms_db[number].serving_vlr
-                        phone = vlr.search_phone(number)
-                        if phone != None: 
-                            return (vlr, phone)
+                        if vlr is not None:
+                            phone = vlr.search_phone(number)
+                            if phone != None: 
+                                return (vlr, phone)
         return (None, None) # Can't find phone in other hlr
 
     def get_serving_bsc(self, phone):

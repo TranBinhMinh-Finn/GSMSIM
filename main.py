@@ -165,20 +165,20 @@ def network_interface():
 
 def statistic_interface():
     while True:
-        print(f"Choose action: (0: return / 1: show the number of call in present / 2: show calls statistic)")
+        print(f"Choose action: (0: return / 1: show the number of call in progress / 2: show calls statistic)")
         action = input()
         if action == "0":
             return
         if action == "1":
-            print(f"There are (is) {utils.number_of_present_calls} call(s) in present.")
+            print(f"There are (is) {utils.number_of_present_calls} call(s) in progress.")
             continue
         if action == "2":
             success_rate = utils.number_of_success_calls * 1.0 / (utils.number_of_success_calls + utils.number_of_busy_calls + utils.number_of_setup_fail_calls) * 100
             setup_failure_rate = utils.number_of_setup_fail_calls * 1.0 / (utils.number_of_success_calls + utils.number_of_busy_calls + utils.number_of_setup_fail_calls) * 100
             busy_rate = utils.number_of_busy_calls * 1.0 / (utils.number_of_success_calls + utils.number_of_busy_calls + utils.number_of_setup_fail_calls) * 100
-            print(f"There are (is) {utils.number_of_success_calls} success call(s). The rate is {success_rate}%.")
-            print(f"There are (is) {utils.number_of_setup_fail_calls} set up failure call(s). The rate is {setup_failure_rate}%.")
-            print(f"There are (is) {utils.number_of_busy_calls} busy call(s). The rate is {busy_rate}%.")
+            print(f"There are (is) {utils.number_of_success_calls} success call(s). ({success_rate}% of total calls).")
+            print(f"There are (is) {utils.number_of_setup_fail_calls} set up failure call(s). ({setup_failure_rate}% of total calls).")
+            print(f"There are (is) {utils.number_of_busy_calls} busy call(s). ({busy_rate}% of total calls).")
             continue
         print(f"Type again.")
         

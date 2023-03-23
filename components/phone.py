@@ -32,7 +32,7 @@ class Phone:
                 print(f'(MS {self.number}): Connected successfully.')
                 self.bts = bts
                 return True
-            print(f'(MS {self.number}): Failed to connect.')
+        print(f'(MS {self.number}): Failed to connect.')
         return False
 
     def disconnect_from_bts(self):
@@ -65,7 +65,7 @@ class Phone:
             utils.number_of_busy_calls += 1
         if result == 2: 
             print(f"(MS {self.number}): Receiver doesn't exist.")
-            utils.number_of_busy_calls += 1
+            utils.number_of_setup_fail_calls += 1
         if result == -1:
             print(f"(MS {self.number}): Line busy.")
             utils.number_of_setup_fail_calls += 1
