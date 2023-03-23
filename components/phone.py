@@ -1,10 +1,10 @@
 from algorithm.com128 import auth
 from datetime import datetime
+import utils
 
 class Phone:
-    def __init__(self, number, imsi, ki, name=""):
+    def __init__(self, number, imsi, ki):
         self.number = number
-        self.name = name
         self.bts = None
         self.ki = ki
         self.kc = None
@@ -26,10 +26,10 @@ class Phone:
     
     def connect_to_bts(self, bts):
         if bts.handle_connection_request(self):
-            print(f'Phone {self.number} connected successfully')
+            print(f'(MS {self.number}: Connected successfully.)')
             self.bts = bts
             return True
-        print(f'Phone {self.number} failed to connect')
+        print(f'(MS {self.number}: Failed to connect.)')
         return False
 
     def connect_to_network(self, network):
@@ -45,17 +45,21 @@ class Phone:
     def make_call(self, receiving_number):
         if not self.bts:
             if not self.connect_to_bts(self.search_for_bts()):
-                print(f"Failed to connect to network.")
+                print(f"(MS {self.number}: Failed to connect to network.)")
                 return
         result = self.bts.make_call(self.number, receiving_number)
         if result == 1:
-            print(f"Receiver is busy.")
+            print(f"(MS {self.number}: Receiver is busy.)")
+            utils.number_of_busy_calls += 1
         if result == 2: 
-            print(f"Receiver doesn't exist")
+            print(f"(MS {self.number}: Receiver doesn't exist)")
+            utils.number_of_busy_calls += 1
         if result == -1:
-            print(f"Line busy")
+            print(f"(MS {self.number}: Line busy)")
+            utils.number_of_setup_fail_calls += 1
         if result == 0:
-            #print(f"Calling {receiving_number}...")
+            utils.number_of_present_calls += 1
+            utils.number_of_success_calls += 1
             self.wait_confirm = True
             self.to_number = receiving_number
     
@@ -73,20 +77,21 @@ class Phone:
     
     def call_alert(self, from_number):
         self.from_number = from_number
+        return 0
     
     def check_state(self):
         if self.from_number != None: 
-            print(f"Receiving call from {self.from_number}")
+            print(f"(MS {self.number}: Receiving call from {self.from_number}...)")
             self.call_confirm()
         if self.in_call == True and self.wait_confirm == False:
-            print(f"In a call with {self.to_number}.")
+            print(f"(MS {self.number}: In a call with {self.to_number}.)")
         if self.in_call == False and self.wait_confirm == True:
-            print(f"Calling {self.to_number}...")    
+            print(f"(MS {self.number}: Calling {self.to_number}...)")    
         if self.decline == True:
-            print(f"Receiver {self.to_number} declined your call.")
+            print(f"(MS {self.number}: Receiver {self.to_number} declined your call.)")
             self.decline = False
         if self.end_time != None:
-            print(f"Call end with {self.call_data.second_number} in {self.end_time - self.call_data.start_time}.")
+            print(f"(MS {self.number}: Call end with {self.call_data.second_number} in {self.end_time - self.call_data.start_time}.)")
             self.end_time = None
     
     def call_confirm(self):
@@ -105,9 +110,10 @@ class Phone:
         result = self.bts.request_end_call(self.number, self.to_number, self.in_call)
         self.wait_confirm = False
         if result == True:
-            print(f"End successful.")
+            print(f"(MS {self.number}: End successful.)")
+            utils.number_of_present_calls -= 1
         else:
-            print(f"Fail to end call.")
+            print(f"(MS {self.number}: Fail to end call.)")
     
     def end_call(self):
         if not self.in_call:
@@ -115,6 +121,11 @@ class Phone:
         else:
             self.in_call = False
             self.end_time = datetime.now()
+    
+    def show_info(self):
+        print(f"Phone number: {self.number}")
+        print(f"IMSI: {self.imsi}")
+        print(f"Ki: {self.ki}")
     
     def text(self, number, message):
         if not self.bts:

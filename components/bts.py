@@ -40,6 +40,8 @@ class BTS:
         phone.call_decline()
     
     def call_alert(self, tmsi, from_number):
+        if self.channels_in_use == self.traffic_channels:
+            return -1
         self.channels_in_use += 1
         phone = self.ms_list.get(tmsi)
         return phone.call_alert(from_number)

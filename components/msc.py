@@ -20,9 +20,10 @@ class MSC:
     
     def add_bts(self):
         for bsc in self.bsc_list.values():
-            if bsc.add_bts():
-                return
+            if bsc.add_bts(): 
+                return True # add bts into old bsc
         self.add_bsc().add_bts()
+        return False # add bts into new bsc
     
     def get_available_bts(self):
         for bsc in self.bsc_list.values():
@@ -87,8 +88,8 @@ class MSC:
             if receiving_phone.is_busy == False and calling_phone.is_busy == False:
                 self.vlr.change_status(calling_number)
                 # Call the msc of receiving side to setup the call
-                receiving_vlr.msc.make_call(calling_number, receiving_number, flag=True)
-                return 0 # Call successful
+                return receiving_vlr.msc.make_call(calling_number, receiving_number, flag=True)
+                #return 0 # Call successful
             else:
                 return 1 # Receiver is busy
         else: # msc on the receiving side
