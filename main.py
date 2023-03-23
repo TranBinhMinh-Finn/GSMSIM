@@ -63,7 +63,7 @@ def ms_interface():
     #print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: connect network")
     while True:
         phone.check_state()
-        print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: connect network / 4: show information)")
+        print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: send sms / 4: connect network / 5: show information / 6: show received message)")
         action = input()
         if action == "0":
             return
@@ -76,6 +76,13 @@ def ms_interface():
             phone.request_end_call()
             continue
         if action == "3":
+            print(f"Type the phone number you want to send message: ")
+            number = input()
+            print(f"Type content: ")
+            content = input()
+            phone.text(number, content)
+            continue
+        if action == "4":
             print(f"Input mcc and mnc number of network: ")
             print(f"Mobile country code (mcc):")
             mcc = input()
@@ -88,8 +95,11 @@ def ms_interface():
                 print(f"Connect successfully")
                 phone.connect_to_network(current_network)
             continue
-        if action == "4":
+        if action == "5":
             phone.show_info()
+            continue
+        if action == "6":
+            phone.show_all_message()
             continue
         print(f"Type again.")
 
