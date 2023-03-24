@@ -95,8 +95,10 @@ class MSC:
             else:
                 return 1 # Receiver is busy
         else: # msc on the receiving side
-            self.vlr.change_status(receiving_number)
             receiving_phone = self.vlr.search_phone(receiving_number)
+            if receiving_phone.is_busy:
+                return 1
+            self.vlr.change_status(receiving_number)
             receiving_phone.phone_calling = calling_number
             bsc = self.get_serving_bsc(receiving_phone)
             if bsc is not None:
