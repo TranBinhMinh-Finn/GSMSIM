@@ -63,7 +63,7 @@ def ms_interface():
     #print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: connect network")
     while True:
         phone.check_state()
-        print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: connect network / 4: show information)")
+        print(f"In ms {phone_number}, choose: (0: return / 1: call / 2: end call / 3: send sms / 4: connect network / 5: show information / 6: show received message)")
         action = input()
         if action == "0":
             return
@@ -76,6 +76,13 @@ def ms_interface():
             phone.request_end_call()
             continue
         if action == "3":
+            print(f"Type the phone number you want to send message: ")
+            number = input()
+            print(f"Type content: ")
+            content = input()
+            phone.text(number, content)
+            continue
+        if action == "4":
             print(f"Input mcc and mnc number of network: ")
             print(f"Mobile country code (mcc):")
             mcc = input()
@@ -88,8 +95,11 @@ def ms_interface():
                 print(f"Connect successfully")
                 phone.connect_to_network(current_network)
             continue
-        if action == "4":
+        if action == "5":
             phone.show_info()
+            continue
+        if action == "6":
+            phone.show_all_message()
             continue
         print(f"Type again.")
 
@@ -136,10 +146,13 @@ def network_interface():
                         continue
                     if action == "2":
                         print(f"Type the number of bts you want to add: ")
-                        number_bts = input()
-                        while number_bts > 0:
-                            current_network.add_bts()
-                            number_bts -= 1
+                        try:
+                            number_bts = int(input())
+                            while number_bts > 0:
+                                current_network.add_bts()
+                                number_bts -= 1
+                        except:
+                            print("Not a number.")
                     if action == "3":
                         current_network.show_all_ms()
                     if action == "4":
@@ -155,20 +168,20 @@ def network_interface():
 
 def statistic_interface():
     while True:
-        print(f"Choose action: (0: return / 1: show the number of call in present / 2: show calls statistic)")
+        print(f"Choose action: (0: return / 1: show the number of call in progress / 2: show calls statistic)")
         action = input()
         if action == "0":
             return
         if action == "1":
-            print(f"There are (is) {utils.number_of_present_calls} call(s) in present.")
+            print(f"There are (is) {utils.number_of_present_calls} call(s) in progress.")
             continue
         if action == "2":
             success_rate = utils.number_of_success_calls * 1.0 / (utils.number_of_success_calls + utils.number_of_busy_calls + utils.number_of_setup_fail_calls) * 100
             setup_failure_rate = utils.number_of_setup_fail_calls * 1.0 / (utils.number_of_success_calls + utils.number_of_busy_calls + utils.number_of_setup_fail_calls) * 100
             busy_rate = utils.number_of_busy_calls * 1.0 / (utils.number_of_success_calls + utils.number_of_busy_calls + utils.number_of_setup_fail_calls) * 100
-            print(f"There are (is) {utils.number_of_success_calls} success call(s). The rate is {success_rate}%.")
-            print(f"There are (is) {utils.number_of_setup_fail_calls} set up failure call(s). The rate is {setup_failure_rate}%.")
-            print(f"There are (is) {utils.number_of_busy_calls} busy call(s). The rate is {busy_rate}%.")
+            print(f"There are (is) {utils.number_of_success_calls} success call(s). ({success_rate}% of total calls).")
+            print(f"There are (is) {utils.number_of_setup_fail_calls} set up failure call(s). ({setup_failure_rate}% of total calls).")
+            print(f"There are (is) {utils.number_of_busy_calls} busy call(s). ({busy_rate}% of total calls).")
             continue
         print(f"Type again.")
         

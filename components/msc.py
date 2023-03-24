@@ -69,9 +69,10 @@ class MSC:
                     hlr = network.hlr
                     if hlr.search_phone(number) != None:
                         vlr = hlr.ms_db[number].serving_vlr
-                        phone = vlr.search_phone(number)
-                        if phone != None: 
-                            return (vlr, phone)
+                        if vlr is not None:
+                            phone = vlr.search_phone(number)
+                            if phone != None: 
+                                return (vlr, phone)
         return (None, None) # Can't find phone in other hlr
 
     def get_serving_bsc(self, phone):
@@ -94,8 +95,10 @@ class MSC:
             else:
                 return 1 # Receiver is busy
         else: # msc on the receiving side
-            self.vlr.change_status(receiving_number)
             receiving_phone = self.vlr.search_phone(receiving_number)
+            if receiving_phone.is_busy:
+                return 1
+            self.vlr.change_status(receiving_number)
             receiving_phone.phone_calling = calling_number
             bsc = self.get_serving_bsc(receiving_phone)
             if bsc is not None:
@@ -150,14 +153,17 @@ class MSC:
             bsc.end_call(second_ms.tmsi)
             return True
         
-    def send_sms(self, sending_number, receiving_number, message):
+    def send_sms(self, sending_number, receiving_number, send_time, message):
         (receiving_vlr, receiving_phone) = self.find_serving_vlr(receiving_number)
+        if receiving_vlr == None: 
+            return -1
         if receiving_vlr != self.vlr: # receiver in different network
-            receiving_vlr.msc.send_sms(sending_number, receiving_number, message)
+            return receiving_vlr.msc.send_sms(sending_number, receiving_number, send_time, message)
         else:
             bsc = self.get_serving_bsc(receiving_phone)
-            bsc.receive_sms(sending_number=sending_number, receiving_tmsi=receiving_phone.tmsi, message=message)
-            
+            bsc.receive_sms(sending_number=sending_number, receiving_tmsi=receiving_phone.tmsi, send_time=send_time, message=message)
+            return 0
+        
     def disconnect_ms(self, phone):
         cc = phone.number[:2]
         ndc = phone.number[2:4]
@@ -168,3 +174,4 @@ class MSC:
         self.vlr.remove_ms(phone.number)
         
     
+
